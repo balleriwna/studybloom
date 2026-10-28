@@ -21,13 +21,13 @@
       theme: {
         extend: {
           colors: {
-            'sb-primary': '#3B82F6',    /* Soft Bright Blue untuk Aksesibilitas Tinggi */
-            'sb-accent': '#2563EB',     /* Darker Blue Tombol/Hover */
-            'sb-powder': '#BFDBFE',     /* Light Accent Border */
-            'sb-light': '#EFF6FF',      /* Soft Blue Background Kartu */
-            'sb-pale': '#F4F8FC',       /* App Main Background */
-            'sb-dark': '#0F172A',       /* Text Utama - Slate 900 */
-            'sb-subtext': '#475569',    /* Subtext - Slate 600 */
+            'sb-primary': '#3B82F6',
+            'sb-accent': '#2563EB',
+            'sb-powder': '#BFDBFE',
+            'sb-light': '#EFF6FF',
+            'sb-pale': '#F4F8FC',
+            'sb-dark': '#0F172A',
+            'sb-subtext': '#475569',
           }
         }
       }
@@ -43,6 +43,7 @@
     }
     .custom-scrollbar::-webkit-scrollbar {
       width: 6px;
+      height: 6px;
     }
     .custom-scrollbar::-webkit-scrollbar-thumb {
       background: #BFDBFE;
@@ -50,7 +51,7 @@
     }
   </style>
 </head>
-<body class="h-screen overflow-hidden flex">
+<body class="h-screen overflow-hidden flex flex-col md:flex-row">
 
   <!-- TOAST NOTIFICATION POPUP -->
   <div id="toast" class="hidden fixed top-5 right-5 z-50 bg-[#0F172A] text-white px-5 py-3.5 rounded-2xl shadow-xl flex items-center gap-3 transition-all duration-300">
@@ -58,18 +59,26 @@
     <span id="toast-message" class="text-sm font-semibold">Notifikasi</span>
   </div>
 
-  <!-- 1. SIDEBAR NAVIGATION -->
-  <aside class="w-64 bg-white border-r border-blue-100 flex flex-col justify-between p-5 z-20 shadow-xs shrink-0">
+  <!-- MOBILE SIDEBAR BACKDROP OVERLAY -->
+  <div id="sidebar-overlay" onclick="toggleMobileSidebar()" class="hidden fixed inset-0 bg-slate-900/50 z-30 md:hidden backdrop-blur-xs transition-opacity"></div>
+
+  <!-- 1. SIDEBAR NAVIGATION (RESPONSIVE DRAWER FOR MOBILE) -->
+  <aside id="main-sidebar" class="fixed md:static top-0 left-0 bottom-0 w-64 bg-white border-r border-blue-100 flex flex-col justify-between p-5 z-40 shadow-lg md:shadow-none transition-transform duration-300 -translate-x-full md:translate-x-0 shrink-0">
     <div>
-      <!-- Logo -->
-      <div class="flex items-center gap-3 px-2 py-3 mb-6">
-        <div class="w-10 h-10 rounded-2xl bg-blue-600 flex items-center justify-center text-white font-bold text-xl shadow-md">
-          🌸
+      <!-- Logo & Close Mobile Button -->
+      <div class="flex items-center justify-between px-2 py-3 mb-6">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-2xl bg-blue-600 flex items-center justify-center text-white font-bold text-xl shadow-md">
+            🌸
+          </div>
+          <div>
+            <span class="text-xl font-extrabold tracking-tight text-slate-900 block leading-none">Studybloom</span>
+            <span class="text-[10px] font-bold text-blue-600 tracking-wider uppercase mt-1 block">Academic Hub</span>
+          </div>
         </div>
-        <div>
-          <span class="text-xl font-extrabold tracking-tight text-slate-900 block leading-none">Studybloom</span>
-          <span class="text-[10px] font-bold text-blue-600 tracking-wider uppercase mt-1 block">Academic Hub</span>
-        </div>
+        <button onclick="toggleMobileSidebar()" class="md:hidden text-slate-500 hover:text-slate-800">
+          <i data-lucide="x" class="w-6 h-6"></i>
+        </button>
       </div>
 
       <!-- Navigation Links -->
@@ -89,24 +98,30 @@
         <button onclick="switchTab('Notes')" id="nav-Notes" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-semibold text-slate-600 hover:bg-blue-50 transition-all">
           <i data-lucide="edit-3" class="w-5 h-5"></i> My Notes
         </button>
+        <button onclick="switchTab('Materials')" id="nav-Materials" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-semibold text-slate-600 hover:bg-blue-50 transition-all">
+          <i data-lucide="folder" class="w-5 h-5"></i> Study Materials
+        </button>
         <button onclick="switchTab('Timer')" id="nav-Timer" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-semibold text-slate-600 hover:bg-blue-50 transition-all">
           <i data-lucide="clock" class="w-5 h-5"></i> Focus Timer
         </button>
         <button onclick="switchTab('Progress')" id="nav-Progress" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-semibold text-slate-600 hover:bg-blue-50 transition-all">
           <i data-lucide="award" class="w-5 h-5"></i> My Progress
         </button>
+        <button onclick="switchTab('Planner')" id="nav-Planner" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-semibold text-slate-600 hover:bg-blue-50 transition-all">
+          <i data-lucide="compass" class="w-5 h-5"></i> Weekly Planner
+        </button>
       </nav>
     </div>
 
     <!-- Firebase Connection Indicator & User Profile -->
-    <div class="space-y-3">
+    <div class="space-y-3 mt-4">
       <div id="sync-status" class="px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-[11px] font-bold flex items-center gap-2">
         <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
-        <span>Menghubungkan ke Realtime DB...</span>
+        <span>Menghubungkan Firebase Realtime...</span>
       </div>
 
       <div class="p-3 bg-slate-50 rounded-2xl flex items-center gap-3 border border-slate-200">
-        <div class="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-sm shadow-xs">
+        <div class="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-sm shadow-xs shrink-0">
           N
         </div>
         <div class="overflow-hidden">
@@ -118,43 +133,48 @@
   </aside>
 
   <!-- MAIN CONTENT AREA -->
-  <div class="flex-1 flex flex-col overflow-y-auto custom-scrollbar">
+  <div class="flex-1 flex flex-col h-full overflow-y-auto custom-scrollbar">
     
     <!-- TOP HEADER -->
-    <header class="h-20 bg-white/90 backdrop-blur-md border-b border-blue-100 px-8 flex items-center justify-between sticky top-0 z-10 shrink-0">
-      <div class="relative w-80">
-        <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4"></i>
-        <input type="text" id="global-search" oninput="handleSearch(this.value)" placeholder="Cari tugas, catatan, atau mata kuliah..." class="w-full bg-slate-100 text-xs text-slate-800 pl-10 pr-4 py-2.5 rounded-2xl border border-transparent focus:border-blue-500 focus:bg-white outline-none transition-all">
+    <header class="h-20 bg-white/90 backdrop-blur-md border-b border-blue-100 px-4 md:px-8 flex items-center justify-between sticky top-0 z-10 shrink-0 gap-3">
+      <div class="flex items-center gap-3 flex-1 md:flex-initial">
+        <button onclick="toggleMobileSidebar()" class="md:hidden p-2 rounded-xl bg-slate-100 text-slate-700 hover:bg-blue-50">
+          <i data-lucide="menu" class="w-5 h-5"></i>
+        </button>
+        <div class="relative w-full md:w-80">
+          <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4"></i>
+          <input type="text" id="global-search" oninput="handleSearch(this.value)" placeholder="Cari tugas, catatan, atau mata kuliah..." class="w-full bg-slate-100 text-xs text-slate-800 pl-10 pr-4 py-2.5 rounded-2xl border border-transparent focus:border-blue-500 focus:bg-white outline-none transition-all">
+        </div>
       </div>
 
-      <div class="flex items-center gap-3">
-        <button onclick="openOcrModal()" class="flex items-center gap-2 bg-blue-50 text-blue-700 hover:bg-blue-100 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all border border-blue-200">
-          <i data-lucide="upload-cloud" class="w-4 h-4 text-blue-600"></i> Import Gambar Jadwal
+      <div class="flex items-center gap-2 md:gap-3">
+        <button onclick="openOcrModal()" class="flex items-center gap-2 bg-blue-50 text-blue-700 hover:bg-blue-100 px-3 md:px-4 py-2.5 rounded-2xl text-xs font-bold transition-all border border-blue-200">
+          <i data-lucide="upload-cloud" class="w-4 h-4 text-blue-600"></i> <span class="hidden sm:inline">Import Gambar Jadwal</span>
         </button>
-        <button onclick="openAddTaskModal()" class="flex items-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-2xl text-xs font-bold hover:bg-blue-700 shadow-sm transition-all">
-          <i data-lucide="plus" class="w-4 h-4"></i> Task Baru
+        <button onclick="openAddTaskModal()" class="flex items-center gap-2 bg-blue-600 text-white px-3 md:px-4 py-2.5 rounded-2xl text-xs font-bold hover:bg-blue-700 shadow-sm transition-all">
+          <i data-lucide="plus" class="w-4 h-4"></i> <span class="hidden sm:inline">Task Baru</span>
         </button>
       </div>
     </header>
 
     <!-- DYNAMIC TAB CONTENT -->
-    <main class="p-8 flex-1">
+    <main class="p-4 md:p-8 flex-1">
       
       <!-- DASHBOARD TAB -->
       <section id="tab-Dashboard" class="tab-view space-y-6">
-        <div class="grid grid-cols-12 gap-8">
+        <div class="grid grid-cols-12 gap-6 md:gap-8">
           <!-- Main 8 Cols -->
           <div class="col-span-12 lg:col-span-8 space-y-6">
-            <div class="bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-500 p-7 rounded-3xl text-white shadow-md relative overflow-hidden">
+            <div class="bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-500 p-6 md:p-7 rounded-3xl text-white shadow-md relative overflow-hidden">
               <div class="relative z-10">
-                <span class="text-xs font-bold uppercase tracking-wider text-blue-100" id="current-date-text">Senin, Hari Kuliah</span>
-                <h1 class="text-2xl font-extrabold mt-1">Selamat Datang di Studybloom, Noy! 👋</h1>
-                <p class="text-xs text-blue-100 font-medium mt-1.5 max-w-xl">Semua perubahan jadwal, tugas, dan catatan Anda tersinkronisasi otomatis secara real-time antar-perangkat.</p>
+                <span class="text-xs font-bold uppercase tracking-wider text-blue-100" id="current-date-text">Senin, Hari Perkuliahan</span>
+                <h1 class="text-xl md:text-2xl font-extrabold mt-1">Selamat Datang di Studybloom, Noy! 👋</h1>
+                <p class="text-xs text-blue-100 font-medium mt-1.5 max-w-xl">Semua aktivitas perkuliahan, jadwal, tugas, dan catatan Anda tersinkronisasi otomatis secara real-time antar-perangkat.</p>
               </div>
             </div>
 
             <!-- Stats -->
-            <div class="grid grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div class="bg-white p-5 rounded-3xl border border-blue-100 shadow-xs">
                 <p class="text-xs font-bold text-slate-500">Tugas Belum Selesai</p>
                 <h3 id="stat-active-tasks" class="text-2xl font-extrabold text-blue-600 mt-1">0</h3>
@@ -170,7 +190,7 @@
             </div>
 
             <!-- Schedule List Today -->
-            <div class="bg-white p-6 rounded-3xl border border-blue-100 shadow-xs space-y-4">
+            <div class="bg-white p-5 md:p-6 rounded-3xl border border-blue-100 shadow-xs space-y-4">
               <div class="flex justify-between items-center">
                 <div>
                   <h3 class="text-base font-bold text-slate-900">Jadwal Perkuliahan Hari Ini</h3>
@@ -182,9 +202,9 @@
             </div>
 
             <!-- Quick Notes -->
-            <div class="bg-white p-6 rounded-3xl border border-blue-100 shadow-xs space-y-3">
+            <div class="bg-white p-5 md:p-6 rounded-3xl border border-blue-100 shadow-xs space-y-3">
               <div class="flex justify-between items-center">
-                <h3 class="text-base font-bold text-slate-900">Quick Notes (Catatan Cepat Cepat)</h3>
+                <h3 class="text-base font-bold text-slate-900">Quick Notes</h3>
                 <span class="text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">✓ Realtime Saved</span>
               </div>
               <textarea id="quick-note-input" oninput="saveQuickNoteFirebase(this.value)" placeholder="Tulis ide instan atau draf cepat di sini..." class="w-full h-24 bg-slate-50 p-4 rounded-2xl text-xs text-slate-800 outline-none border border-slate-200 focus:border-blue-500 focus:bg-white resize-none transition-all font-medium"></textarea>
@@ -199,7 +219,7 @@
           <!-- Right 4 Cols -->
           <div class="col-span-12 lg:col-span-4 space-y-6">
             <!-- Mini Calendar Widget -->
-            <div class="bg-white p-6 rounded-3xl border border-blue-100 shadow-xs space-y-4">
+            <div class="bg-white p-5 md:p-6 rounded-3xl border border-blue-100 shadow-xs space-y-4">
               <div class="flex justify-between items-center">
                 <h3 class="text-sm font-bold text-slate-900">Kalender Akademik</h3>
                 <span class="text-xs font-bold text-blue-600" id="calendar-month-year">Oktober 2026</span>
@@ -221,16 +241,16 @@
 
       <!-- SCHEDULE TAB -->
       <section id="tab-Schedule" class="tab-view hidden space-y-6">
-        <div class="flex justify-between items-center">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h2 class="text-xl font-bold text-slate-900">Jadwal Perkuliahan</h2>
-            <p class="text-xs text-slate-500">Daftar jadwal perkuliahan Hukum yang tersinkronisasi secara real-time.</p>
+            <h2 class="text-xl font-bold text-slate-900">Jadwal Perkuliahan Mingguan</h2>
+            <p class="text-xs text-slate-500">Daftar jadwal perkuliahan lengkap yang tersinkronisasi secara real-time.</p>
           </div>
-          <button onclick="resetToDefaultSchedule()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold border border-slate-300">
-            🔄 Reset ke Jadwal Default
+          <button onclick="resetToDefaultSchedule()" class="self-start sm:self-auto px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold border border-slate-300 transition-all">
+            🔄 Reset ke Jadwal Utama
           </button>
         </div>
-        <div id="schedule-grid" class="grid grid-cols-1 md:grid-cols-5 gap-4"></div>
+        <div id="schedule-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4"></div>
       </section>
 
       <!-- TASKS TAB -->
@@ -240,7 +260,7 @@
             <h2 class="text-xl font-bold text-slate-900">Manajemen Tugas & Deadline</h2>
             <p class="text-xs text-slate-500">Kelola dan update status pengerjaan tugas akademik Anda.</p>
           </div>
-          <button onclick="openAddTaskModal()" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-xs hover:bg-blue-700">+ Add Task Baru</button>
+          <button onclick="openAddTaskModal()" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-xs hover:bg-blue-700 transition-all">+ Add Task Baru</button>
         </div>
         <div id="tasks-kanban" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
       </section>
@@ -249,19 +269,41 @@
       <section id="tab-Courses" class="tab-view hidden space-y-6">
         <div>
           <h2 class="text-xl font-bold text-slate-900">Mata Kuliah Semester Ini</h2>
-          <p class="text-xs text-slate-500">Daftar lengkap mata kuliah yang terdaftar di jadwal Anda.</p>
+          <p class="text-xs text-slate-500">Daftar lengkap mata kuliah yang terdaftar di jadwal perkuliahan Anda.</p>
         </div>
-        <div id="courses-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+        <div id="courses-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6"></div>
+      </section>
+
+      <!-- STUDY MATERIALS TAB -->
+      <section id="tab-Materials" class="tab-view hidden space-y-6">
+        <div>
+          <h2 class="text-xl font-bold text-slate-900">Study Materials (Materi Pembelajaran)</h2>
+          <p class="text-xs text-slate-500">Perpustakaan digital untuk modul, e-book, dan artikel jurnal perkuliahan.</p>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div class="bg-white p-5 rounded-3xl border border-blue-100 space-y-3 shadow-xs">
+            <div class="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">📚</div>
+            <h4 class="text-sm font-bold text-slate-900">Modul Hukum Administrasi Negara</h4>
+            <p class="text-xs text-slate-500">Format: PDF • Terakhir Diperbarui: 2026-10-20</p>
+            <button onclick="showToast('📥 Mengunduh Modul HAN...')" class="w-full py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold rounded-xl text-xs transition-all border border-blue-200">Unduh Materi</button>
+          </div>
+          <div class="bg-white p-5 rounded-3xl border border-blue-100 space-y-3 shadow-xs">
+            <div class="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">⚖️</div>
+            <h4 class="text-sm font-bold text-slate-900">Draf Kitab Undang-Undang Hukum Dagang</h4>
+            <p class="text-xs text-slate-500">Format: DOCX • Terakhir Diperbarui: 2026-10-24</p>
+            <button onclick="showToast('📥 Mengunduh KUHD...')" class="w-full py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold rounded-xl text-xs transition-all border border-blue-200">Unduh Materi</button>
+          </div>
+        </div>
       </section>
 
       <!-- NOTES TAB -->
       <section id="tab-Notes" class="tab-view hidden space-y-6">
-        <div class="grid grid-cols-12 gap-8">
+        <div class="grid grid-cols-12 gap-6 md:gap-8">
           <div class="col-span-12 md:col-span-5 bg-white p-6 rounded-3xl border border-blue-100 space-y-3 shadow-xs">
             <h3 class="text-base font-bold text-slate-900">Buat Catatan Baru</h3>
             <input type="text" id="note-title" placeholder="Judul Catatan..." class="w-full bg-slate-50 p-3 rounded-2xl text-xs border border-slate-200 outline-none font-semibold focus:border-blue-500">
             <textarea id="note-content" placeholder="Tuliskan catatan perkuliahan lengkap di sini..." class="w-full h-40 bg-slate-50 p-3 rounded-2xl text-xs border border-slate-200 outline-none resize-none focus:border-blue-500 font-medium"></textarea>
-            <button onclick="addNoteFirebase()" class="w-full py-3 bg-blue-600 text-white font-bold rounded-2xl text-xs hover:bg-blue-700 shadow-sm">Simpan Catatan ke Firebase</button>
+            <button onclick="addNoteFirebase()" class="w-full py-3 bg-blue-600 text-white font-bold rounded-2xl text-xs hover:bg-blue-700 shadow-sm transition-all">Simpan Catatan ke Firebase</button>
           </div>
           <div class="col-span-12 md:col-span-7 space-y-3">
             <h3 class="text-base font-bold text-slate-900">Daftar Catatan Tersimpan</h3>
@@ -272,17 +314,17 @@
 
       <!-- TIMER TAB -->
       <section id="tab-Timer" class="tab-view hidden space-y-6">
-        <div class="max-w-md mx-auto bg-white p-8 rounded-4xl border border-blue-100 text-center space-y-6 shadow-xs">
+        <div class="max-w-md mx-auto bg-white p-6 sm:p-8 rounded-4xl border border-blue-100 text-center space-y-6 shadow-xs">
           <div>
             <h2 class="text-xl font-bold text-slate-900">Pomodoro Focus Timer</h2>
             <p class="text-xs text-slate-500 mt-1">25 Menit Sesi Belajar Fokus & 5 Menit Istirahat</p>
           </div>
-          <div class="w-56 h-56 mx-auto rounded-full bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center border-8 border-white shadow-inner">
-            <span id="timer-display" class="text-5xl font-extrabold text-slate-900">25:00</span>
+          <div class="w-48 h-48 sm:w-56 sm:h-56 mx-auto rounded-full bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center border-8 border-white shadow-inner">
+            <span id="timer-display" class="text-4xl sm:text-5xl font-extrabold text-slate-900">25:00</span>
           </div>
           <div class="flex justify-center gap-3">
-            <button id="timer-btn" onclick="toggleTimer()" class="px-8 py-3 bg-blue-600 text-white font-bold text-xs rounded-2xl hover:bg-blue-700 shadow-sm">Mulai Belajar</button>
-            <button onclick="resetTimer()" class="px-5 py-3 bg-slate-100 text-slate-700 font-bold text-xs rounded-2xl hover:bg-slate-200 border border-slate-200">Reset</button>
+            <button id="timer-btn" onclick="toggleTimer()" class="px-6 sm:px-8 py-3 bg-blue-600 text-white font-bold text-xs rounded-2xl hover:bg-blue-700 shadow-sm transition-all">Mulai Belajar</button>
+            <button onclick="resetTimer()" class="px-5 py-3 bg-slate-100 text-slate-700 font-bold text-xs rounded-2xl hover:bg-slate-200 border border-slate-200 transition-all">Reset</button>
           </div>
         </div>
       </section>
@@ -293,7 +335,7 @@
           <h2 class="text-xl font-bold text-slate-900">My Academic Progress</h2>
           <p class="text-xs text-slate-500">Statistik real-time aktivitas perkuliahan dan tugas Anda.</p>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div class="bg-white p-6 rounded-3xl border border-blue-100 space-y-2 shadow-xs">
             <p class="text-xs font-bold text-slate-500">Total Sesi Waktu Belajar</p>
             <h3 id="stat-study-mins" class="text-3xl font-extrabold text-blue-600">0 Menit</h3>
@@ -301,6 +343,37 @@
           <div class="bg-white p-6 rounded-3xl border border-blue-100 space-y-2 shadow-xs">
             <p class="text-xs font-bold text-slate-500">Rasio Penyelesaian Tugas</p>
             <h3 id="stat-rate" class="text-3xl font-extrabold text-slate-900">0%</h3>
+          </div>
+        </div>
+      </section>
+
+      <!-- PLANNER & EXAM PREP TAB -->
+      <section id="tab-Planner" class="tab-view hidden space-y-6">
+        <div>
+          <h2 class="text-xl font-bold text-slate-900">Weekly Study Planner & Exam Preparation</h2>
+          <p class="text-xs text-slate-500">Rencanakan target belajar mingguan dan persiapan ujian UTS / UAS Anda.</p>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="bg-white p-6 rounded-3xl border border-blue-100 space-y-4 shadow-xs">
+            <h3 class="text-base font-bold text-slate-900">Target Belajar Mingguan</h3>
+            <div class="space-y-2 text-xs font-semibold text-slate-700">
+              <label class="flex items-center gap-3 p-3 bg-slate-50 rounded-2xl border border-slate-200">
+                <input type="checkbox" checked class="w-4 h-4 text-blue-600 rounded">
+                <span>Review materi Hukum Acara Pidana</span>
+              </label>
+              <label class="flex items-center gap-3 p-3 bg-slate-50 rounded-2xl border border-slate-200">
+                <input type="checkbox" class="w-4 h-4 text-blue-600 rounded">
+                <span>Kerjakan latihan studi kasus Hukum Dagang</span>
+              </label>
+            </div>
+          </div>
+          <div class="bg-white p-6 rounded-3xl border border-blue-100 space-y-4 shadow-xs">
+            <h3 class="text-base font-bold text-slate-900">Jadwal Ujian & Presentasi</h3>
+            <div class="p-4 bg-blue-50 rounded-2xl border border-blue-200 text-xs space-y-1">
+              <span class="font-bold text-blue-700 bg-white px-2 py-0.5 rounded-md">UTS Minggu Depan</span>
+              <p class="font-bold text-slate-900 mt-1">Ujian Tengah Semester - Hukum Adat</p>
+              <p class="text-slate-500">Materi: Sistem Kekerabatan & Hukum Waris</p>
+            </div>
           </div>
         </div>
       </section>
@@ -328,7 +401,7 @@
           <label class="block font-bold text-slate-700 mb-1">Tanggal Deadline</label>
           <input type="date" id="task-input-date" class="w-full bg-slate-50 p-3 rounded-2xl border border-slate-200 outline-none font-semibold focus:border-blue-500">
         </div>
-        <button onclick="saveNewTaskFirebase()" class="w-full py-3 bg-blue-600 text-white font-bold rounded-2xl hover:bg-blue-700 shadow-sm mt-2">Simpan Task ke Firebase</button>
+        <button onclick="saveNewTaskFirebase()" class="w-full py-3 bg-blue-600 text-white font-bold rounded-2xl hover:bg-blue-700 shadow-sm mt-2 transition-all">Simpan Task ke Firebase</button>
       </div>
     </div>
   </div>
@@ -343,7 +416,7 @@
       <p class="text-xs text-slate-500">Pilih gambar file jadwal kuliah Anda (JPG/PNG) untuk mengekstrak data otomatis.</p>
       <div class="border-2 border-dashed border-blue-300 p-8 rounded-2xl bg-blue-50/50 space-y-3">
         <i data-lucide="image" class="w-8 h-8 text-blue-500 mx-auto"></i>
-        <button onclick="runOcrSimulation()" id="ocr-btn" class="px-5 py-2.5 bg-blue-600 text-white font-bold text-xs rounded-xl hover:bg-blue-700 shadow-xs">Simulasi Pindai & Tambah Jadwal</button>
+        <button onclick="runOcrSimulation()" id="ocr-btn" class="px-5 py-2.5 bg-blue-600 text-white font-bold text-xs rounded-xl hover:bg-blue-700 shadow-xs transition-all">Simulasi Pindai & Tambah Jadwal</button>
       </div>
     </div>
   </div>
@@ -367,6 +440,21 @@
     // Init Lucide Icons
     lucide.createIcons();
 
+    // Toggle Mobile Drawer Sidebar
+    function toggleMobileSidebar() {
+      const sidebar = document.getElementById('main-sidebar');
+      const overlay = document.getElementById('sidebar-overlay');
+      const isHidden = sidebar.classList.contains('-translate-x-full');
+      
+      if (isHidden) {
+        sidebar.classList.remove('-translate-x-full');
+        overlay.classList.remove('hidden');
+      } else {
+        sidebar.classList.add('-translate-x-full');
+        overlay.classList.add('hidden');
+      }
+    }
+
     // Default Schedule Data Requested
     const defaultSchedule = [
       // SENIN
@@ -382,8 +470,8 @@
       { id: 'sch_8', day: 'Rabu', time: 'Jam ke-7–8', name: 'Hukum Administrasi Negara', code: 'LAW3231407' },
       { id: 'sch_9', day: 'Rabu', time: 'Jam ke-9–10', name: 'Metodologi Interpretasi Hukum', code: 'LAW3231203' },
       // KAMIS
-      { id: 'sch_10', day: 'Kamis', time: 'Jam ke-7–8', name: 'Hukum Acara Pidana', code: 'LAW3231409' },
-      { id: 'sch_11', day: 'Kamis', time: 'Jam ke-5–6', name: 'Kriminologi', code: 'LAW3231218' },
+      { id: 'sch_10', day: 'Kamis', time: 'Jam ke-5–6', name: 'Kriminologi', code: 'LAW3231218' },
+      { id: 'sch_11', day: 'Kamis', time: 'Jam ke-7–8', name: 'Hukum Acara Pidana', code: 'LAW3231409' },
       // JUMAT
       { id: 'sch_12', day: 'Jumat', time: 'Jam ke-11–12', name: 'Hukum Konstitusi', code: 'LAW3231215' }
     ];
@@ -418,7 +506,6 @@
           studyMins: data.studyMins || 0
         };
       } else {
-        // Initialize Default Database Value
         pushStateToFirebase();
       }
 
@@ -465,6 +552,12 @@
         activeBtn.classList.add('bg-blue-600', 'text-white', 'shadow-sm');
         activeBtn.classList.remove('text-slate-600');
       }
+
+      // Auto close sidebar on mobile after selecting menu
+      if (window.innerWidth < 768) {
+        document.getElementById('main-sidebar').classList.add('-translate-x-full');
+        document.getElementById('sidebar-overlay').classList.add('hidden');
+      }
     }
 
     // Render Logic across views
@@ -484,7 +577,7 @@
 
       // Dashboard Today Schedule
       const schedContainer = document.getElementById('today-schedule-list');
-      const todaySchedule = appState.schedule.filter(s => s.day === 'Senin'); // Display Monday by Default
+      const todaySchedule = appState.schedule.filter(s => s.day === 'Senin');
 
       if (todaySchedule.length > 0) {
         schedContainer.innerHTML = todaySchedule.map(c => `
@@ -559,7 +652,7 @@
         `;
       }).join('');
 
-      // Courses View (Unique Course List)
+      // Courses View
       const uniqueCourses = [];
       const courseMap = new Map();
       appState.schedule.forEach(s => {
