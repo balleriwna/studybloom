@@ -11,19 +11,23 @@
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
   
-  <!-- Custom Tailwind Color Scheme (Vibrant Soft Blue Theme) -->
+  <!-- Firebase SDK (Compat v10 for HTML single-file ease) -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
+  <!-- Custom Tailwind Color Scheme (Vibrant Yet Soft Blue) -->
   <script>
     tailwind.config = {
       theme: {
         extend: {
           colors: {
-            'sb-primary': '#4A86E8',    /* Biru Soft Lebih Tegas/Fresh */
-            'sb-powder': '#C2DCF7',     /* Powder Blue Berkontras */
-            'sb-light': '#E2EEF9',      /* Light Blue Kartu */
-            'sb-pale': '#EEF4FB',       /* App Background */
-            'sb-dark': '#1F2D42',       /* Dark Navy Teks Utama */
-            'sb-subtext': '#4A5B73',    /* Subtext Khas UMS */
-            'sb-[#4A86E8]': '#4A86E8',
+            'sb-primary': '#3B82F6',    /* Soft Bright Blue untuk Aksesibilitas Tinggi */
+            'sb-accent': '#2563EB',     /* Darker Blue Tombol/Hover */
+            'sb-powder': '#BFDBFE',     /* Light Accent Border */
+            'sb-light': '#EFF6FF',      /* Soft Blue Background Kartu */
+            'sb-pale': '#F4F8FC',       /* App Main Background */
+            'sb-dark': '#0F172A',       /* Text Utama - Slate 900 */
+            'sb-subtext': '#475569',    /* Subtext - Slate 600 */
           }
         }
       }
@@ -34,81 +38,100 @@
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
+      background-color: #F4F8FC;
+      color: #0F172A;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #BFDBFE;
+      border-radius: 10px;
     }
   </style>
 </head>
-<body class="bg-[#EEF4FB] text-[#1F2D42] h-screen overflow-hidden flex">
+<body class="h-screen overflow-hidden flex">
 
   <!-- TOAST NOTIFICATION POPUP -->
-  <div id="toast" class="hidden fixed top-5 right-5 z-50 bg-[#1F2D42] text-white px-5 py-3.5 rounded-2xl shadow-xl flex items-center gap-3 transition-all duration-300">
-    <i data-lucide="sparkles" class="text-[#4A86E8] w-5 h-5"></i>
+  <div id="toast" class="hidden fixed top-5 right-5 z-50 bg-[#0F172A] text-white px-5 py-3.5 rounded-2xl shadow-xl flex items-center gap-3 transition-all duration-300">
+    <i data-lucide="sparkles" class="text-blue-400 w-5 h-5"></i>
     <span id="toast-message" class="text-sm font-semibold">Notifikasi</span>
   </div>
 
   <!-- 1. SIDEBAR NAVIGATION -->
-  <aside class="w-64 bg-white border-r border-[#C2DCF7] flex flex-col justify-between p-5 z-20 shadow-sm shrink-0">
+  <aside class="w-64 bg-white border-r border-blue-100 flex flex-col justify-between p-5 z-20 shadow-xs shrink-0">
     <div>
       <!-- Logo -->
       <div class="flex items-center gap-3 px-2 py-3 mb-6">
-        <div class="w-10 h-10 rounded-2xl bg-[#4A86E8] flex items-center justify-center text-white font-bold text-xl shadow-md">
+        <div class="w-10 h-10 rounded-2xl bg-blue-600 flex items-center justify-center text-white font-bold text-xl shadow-md">
           🌸
         </div>
-        <span class="text-xl font-bold tracking-tight text-[#1F2D42]">Studybloom</span>
+        <div>
+          <span class="text-xl font-extrabold tracking-tight text-slate-900 block leading-none">Studybloom</span>
+          <span class="text-[10px] font-bold text-blue-600 tracking-wider uppercase mt-1 block">Academic Hub</span>
+        </div>
       </div>
 
       <!-- Navigation Links -->
       <nav class="space-y-1.5" id="sidebar-menu">
-        <button onclick="switchTab('Dashboard')" id="nav-Dashboard" class="nav-btn active-nav w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-semibold transition-all">
+        <button onclick="switchTab('Dashboard')" id="nav-Dashboard" class="nav-btn active-nav w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-bold bg-blue-600 text-white shadow-sm transition-all">
           <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard
         </button>
-        <button onclick="switchTab('Schedule')" id="nav-Schedule" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-semibold text-[#4A5B73] hover:bg-[#E2EEF9] transition-all">
+        <button onclick="switchTab('Schedule')" id="nav-Schedule" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-semibold text-slate-600 hover:bg-blue-50 transition-all">
           <i data-lucide="calendar" class="w-5 h-5"></i> My Schedule
         </button>
-        <button onclick="switchTab('Tasks')" id="nav-Tasks" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-semibold text-[#4A5B73] hover:bg-[#E2EEF9] transition-all">
+        <button onclick="switchTab('Tasks')" id="nav-Tasks" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-semibold text-slate-600 hover:bg-blue-50 transition-all">
           <i data-lucide="check-square" class="w-5 h-5"></i> My Tasks
         </button>
-        <button onclick="switchTab('Courses')" id="nav-Courses" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-semibold text-[#4A5B73] hover:bg-[#E2EEF9] transition-all">
+        <button onclick="switchTab('Courses')" id="nav-Courses" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-semibold text-slate-600 hover:bg-blue-50 transition-all">
           <i data-lucide="book-open" class="w-5 h-5"></i> My Courses
         </button>
-        <button onclick="switchTab('Notes')" id="nav-Notes" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-semibold text-[#4A5B73] hover:bg-[#E2EEF9] transition-all">
+        <button onclick="switchTab('Notes')" id="nav-Notes" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-semibold text-slate-600 hover:bg-blue-50 transition-all">
           <i data-lucide="edit-3" class="w-5 h-5"></i> My Notes
         </button>
-        <button onclick="switchTab('Timer')" id="nav-Timer" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-semibold text-[#4A5B73] hover:bg-[#E2EEF9] transition-all">
+        <button onclick="switchTab('Timer')" id="nav-Timer" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-semibold text-slate-600 hover:bg-blue-50 transition-all">
           <i data-lucide="clock" class="w-5 h-5"></i> Focus Timer
         </button>
-        <button onclick="switchTab('Progress')" id="nav-Progress" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-semibold text-[#4A5B73] hover:bg-[#E2EEF9] transition-all">
+        <button onclick="switchTab('Progress')" id="nav-Progress" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-semibold text-slate-600 hover:bg-blue-50 transition-all">
           <i data-lucide="award" class="w-5 h-5"></i> My Progress
         </button>
       </nav>
     </div>
 
-    <!-- User Profile Widget (UMS) -->
-    <div class="p-3 bg-[#EEF4FB] rounded-2xl flex items-center gap-3 border border-[#C2DCF7]">
-      <div class="w-9 h-9 rounded-full bg-[#4A86E8] text-white flex items-center justify-center font-bold text-sm shadow-xs">
-        N
+    <!-- Firebase Connection Indicator & User Profile -->
+    <div class="space-y-3">
+      <div id="sync-status" class="px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-[11px] font-bold flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+        <span>Menghubungkan ke Realtime DB...</span>
       </div>
-      <div class="overflow-hidden">
-        <h4 class="text-xs font-bold text-[#1F2D42] truncate">Noy</h4>
-        <p class="text-[11px] text-[#4A5B73] font-semibold truncate">UMS • Student</p>
+
+      <div class="p-3 bg-slate-50 rounded-2xl flex items-center gap-3 border border-slate-200">
+        <div class="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-sm shadow-xs">
+          N
+        </div>
+        <div class="overflow-hidden">
+          <h4 class="text-xs font-bold text-slate-900 truncate">Noy</h4>
+          <p class="text-[11px] text-slate-500 font-semibold truncate">Fakultas Hukum</p>
+        </div>
       </div>
     </div>
   </aside>
 
   <!-- MAIN CONTENT AREA -->
-  <div class="flex-1 flex flex-col overflow-y-auto">
+  <div class="flex-1 flex flex-col overflow-y-auto custom-scrollbar">
     
     <!-- TOP HEADER -->
-    <header class="h-20 bg-white/90 backdrop-blur-md border-b border-[#C2DCF7] px-8 flex items-center justify-between sticky top-0 z-10 shrink-0">
+    <header class="h-20 bg-white/90 backdrop-blur-md border-b border-blue-100 px-8 flex items-center justify-between sticky top-0 z-10 shrink-0">
       <div class="relative w-80">
-        <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#4A5B73] w-4 h-4"></i>
-        <input type="text" id="global-search" oninput="handleSearch(this.value)" placeholder="Cari tugas atau mata kuliah..." class="w-full bg-[#EEF4FB] text-xs text-[#1F2D42] pl-10 pr-4 py-2.5 rounded-2xl border border-transparent focus:border-[#4A86E8] outline-none">
+        <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 w-4 h-4"></i>
+        <input type="text" id="global-search" oninput="handleSearch(this.value)" placeholder="Cari tugas, catatan, atau mata kuliah..." class="w-full bg-slate-100 text-xs text-slate-800 pl-10 pr-4 py-2.5 rounded-2xl border border-transparent focus:border-blue-500 focus:bg-white outline-none transition-all">
       </div>
 
       <div class="flex items-center gap-3">
-        <button onclick="openOcrModal()" class="flex items-center gap-2 bg-[#E2EEF9] text-[#1F2D42] px-4 py-2.5 rounded-2xl text-xs font-bold hover:bg-[#C2DCF7] transition-all">
-          <i data-lucide="upload" class="w-4 h-4 text-[#4A86E8]"></i> Unggah Jadwal STAR UMS
+        <button onclick="openOcrModal()" class="flex items-center gap-2 bg-blue-50 text-blue-700 hover:bg-blue-100 px-4 py-2.5 rounded-2xl text-xs font-bold transition-all border border-blue-200">
+          <i data-lucide="upload-cloud" class="w-4 h-4 text-blue-600"></i> Import Gambar Jadwal
         </button>
-        <button onclick="openAddTaskModal()" class="flex items-center gap-2 bg-[#4A86E8] text-white px-4 py-2.5 rounded-2xl text-xs font-bold hover:bg-[#3B71CA] shadow-sm transition-all">
+        <button onclick="openAddTaskModal()" class="flex items-center gap-2 bg-blue-600 text-white px-4 py-2.5 rounded-2xl text-xs font-bold hover:bg-blue-700 shadow-sm transition-all">
           <i data-lucide="plus" class="w-4 h-4"></i> Task Baru
         </button>
       </div>
@@ -122,47 +145,52 @@
         <div class="grid grid-cols-12 gap-8">
           <!-- Main 8 Cols -->
           <div class="col-span-12 lg:col-span-8 space-y-6">
-            <div class="bg-gradient-to-r from-[#C2DCF7] via-[#E2EEF9] to-white p-7 rounded-3xl border border-[#C2DCF7] shadow-xs">
-              <span class="text-xs font-bold uppercase tracking-wider text-[#4A5B73]">Rabu, 28 Oktober 2026</span>
-              <h1 class="text-2xl font-bold text-[#1F2D42] mt-1">Selamat Pagi, Noy! 👋</h1>
-              <p class="text-sm text-[#4A5B73] font-medium mt-1">Kelola jadwal perkuliahan UMS, deadline tugas, dan produktivitas belajar Anda dalam satu tempat.</p>
+            <div class="bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-500 p-7 rounded-3xl text-white shadow-md relative overflow-hidden">
+              <div class="relative z-10">
+                <span class="text-xs font-bold uppercase tracking-wider text-blue-100" id="current-date-text">Senin, Hari Kuliah</span>
+                <h1 class="text-2xl font-extrabold mt-1">Selamat Datang di Studybloom, Noy! 👋</h1>
+                <p class="text-xs text-blue-100 font-medium mt-1.5 max-w-xl">Semua perubahan jadwal, tugas, dan catatan Anda tersinkronisasi otomatis secara real-time antar-perangkat.</p>
+              </div>
             </div>
 
             <!-- Stats -->
             <div class="grid grid-cols-3 gap-4">
-              <div class="bg-white p-5 rounded-3xl border border-[#C2DCF7] shadow-xs">
-                <p class="text-xs font-bold text-[#4A5B73]">Tugas Aktif</p>
-                <h3 id="stat-active-tasks" class="text-2xl font-extrabold text-[#4A86E8] mt-1">0</h3>
+              <div class="bg-white p-5 rounded-3xl border border-blue-100 shadow-xs">
+                <p class="text-xs font-bold text-slate-500">Tugas Belum Selesai</p>
+                <h3 id="stat-active-tasks" class="text-2xl font-extrabold text-blue-600 mt-1">0</h3>
               </div>
-              <div class="bg-white p-5 rounded-3xl border border-[#C2DCF7] shadow-xs">
-                <p class="text-xs font-bold text-[#4A5B73]">Mendekati Deadline</p>
-                <h3 class="text-2xl font-extrabold text-amber-600 mt-1">2</h3>
+              <div class="bg-white p-5 rounded-3xl border border-blue-100 shadow-xs">
+                <p class="text-xs font-bold text-slate-500">Prioritas Tinggi</p>
+                <h3 id="stat-high-priority" class="text-2xl font-extrabold text-amber-500 mt-1">0</h3>
               </div>
-              <div class="bg-white p-5 rounded-3xl border border-[#C2DCF7] shadow-xs">
-                <p class="text-xs font-bold text-[#4A5B73]">Tugas Selesai</p>
+              <div class="bg-white p-5 rounded-3xl border border-blue-100 shadow-xs">
+                <p class="text-xs font-bold text-slate-500">Tugas Selesai</p>
                 <h3 id="stat-completed-tasks" class="text-2xl font-extrabold text-emerald-600 mt-1">0</h3>
               </div>
             </div>
 
-            <!-- Schedule List -->
-            <div class="bg-white p-6 rounded-3xl border border-[#C2DCF7] shadow-xs space-y-4">
+            <!-- Schedule List Today -->
+            <div class="bg-white p-6 rounded-3xl border border-blue-100 shadow-xs space-y-4">
               <div class="flex justify-between items-center">
-                <h3 class="text-base font-bold text-[#1F2D42]">Jadwal Kuliah Hari Ini</h3>
-                <button onclick="switchTab('Schedule')" class="text-xs font-bold text-[#4A86E8] hover:underline">Lihat Semua ›</button>
+                <div>
+                  <h3 class="text-base font-bold text-slate-900">Jadwal Perkuliahan Hari Ini</h3>
+                  <p class="text-[11px] font-semibold text-slate-500" id="today-day-label">Hari Ini</p>
+                </div>
+                <button onclick="switchTab('Schedule')" class="text-xs font-bold text-blue-600 hover:underline">Lihat Semua ›</button>
               </div>
               <div id="today-schedule-list" class="space-y-3"></div>
             </div>
 
             <!-- Quick Notes -->
-            <div class="bg-white p-6 rounded-3xl border border-[#C2DCF7] shadow-xs space-y-3">
+            <div class="bg-white p-6 rounded-3xl border border-blue-100 shadow-xs space-y-3">
               <div class="flex justify-between items-center">
-                <h3 class="text-base font-bold text-[#1F2D42]">Quick Notes (Catatan Cepat)</h3>
-                <span class="text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2.5 py-1 rounded-full">✓ Autosaved</span>
+                <h3 class="text-base font-bold text-slate-900">Quick Notes (Catatan Cepat Cepat)</h3>
+                <span class="text-[11px] font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">✓ Realtime Saved</span>
               </div>
-              <textarea id="quick-note-input" oninput="saveQuickNote(this.value)" placeholder="Tulis ide atau pengingat instan di sini..." class="w-full h-24 bg-[#EEF4FB] p-4 rounded-2xl text-sm text-[#1F2D42] outline-none border border-transparent focus:border-[#4A86E8] resize-none"></textarea>
+              <textarea id="quick-note-input" oninput="saveQuickNoteFirebase(this.value)" placeholder="Tulis ide instan atau draf cepat di sini..." class="w-full h-24 bg-slate-50 p-4 rounded-2xl text-xs text-slate-800 outline-none border border-slate-200 focus:border-blue-500 focus:bg-white resize-none transition-all font-medium"></textarea>
               <div class="flex justify-end">
-                <button onclick="convertQuickNoteToTask()" class="px-4 py-2 bg-[#E2EEF9] text-[#1F2D42] rounded-xl text-xs font-bold hover:bg-[#C2DCF7]">
-                  + Ubah Jadi Task
+                <button onclick="convertQuickNoteToTask()" class="px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-xl text-xs font-bold border border-blue-200 transition-all">
+                  + Convert Jadi Task Baru
                 </button>
               </div>
             </div>
@@ -170,18 +198,21 @@
 
           <!-- Right 4 Cols -->
           <div class="col-span-12 lg:col-span-4 space-y-6">
-            <!-- Mini Calendar -->
-            <div class="bg-white p-6 rounded-3xl border border-[#C2DCF7] shadow-xs space-y-4">
-              <h3 class="text-base font-bold text-[#1F2D42]">Oktober 2026</h3>
-              <div class="grid grid-cols-7 gap-1 text-center text-xs font-bold text-[#4A5B73]" id="mini-calendar"></div>
+            <!-- Mini Calendar Widget -->
+            <div class="bg-white p-6 rounded-3xl border border-blue-100 shadow-xs space-y-4">
+              <div class="flex justify-between items-center">
+                <h3 class="text-sm font-bold text-slate-900">Kalender Akademik</h3>
+                <span class="text-xs font-bold text-blue-600" id="calendar-month-year">Oktober 2026</span>
+              </div>
+              <div class="grid grid-cols-7 gap-1 text-center text-xs font-bold text-slate-400" id="mini-calendar"></div>
             </div>
 
             <!-- Pomodoro Link Widget -->
-            <div class="bg-gradient-to-br from-[#E2EEF9] to-white p-6 rounded-3xl border border-[#C2DCF7] text-center space-y-3">
-              <span class="text-xs font-bold text-[#4A5B73] uppercase tracking-wider block">Focus Session</span>
-              <h2 class="text-3xl font-extrabold text-[#1F2D42] my-2">25:00</h2>
-              <button onclick="switchTab('Timer')" class="w-full py-2.5 bg-[#4A86E8] text-white font-bold text-xs rounded-2xl hover:bg-[#3B71CA] shadow-xs transition-all">
-                Mulai Sesi Belajar
+            <div class="bg-gradient-to-br from-blue-50 to-indigo-50/50 p-6 rounded-3xl border border-blue-100 text-center space-y-3">
+              <span class="text-xs font-bold text-blue-600 uppercase tracking-wider block">Focus Session</span>
+              <h2 id="dash-timer-display" class="text-4xl font-extrabold text-slate-900 my-1">25:00</h2>
+              <button onclick="switchTab('Timer')" class="w-full py-3 bg-blue-600 text-white font-bold text-xs rounded-2xl hover:bg-blue-700 shadow-sm transition-all">
+                Buka Pomodoro Timer
               </button>
             </div>
           </div>
@@ -190,9 +221,14 @@
 
       <!-- SCHEDULE TAB -->
       <section id="tab-Schedule" class="tab-view hidden space-y-6">
-        <div>
-          <h2 class="text-xl font-bold text-[#1F2D42]">Jadwal Perkuliahan UMS</h2>
-          <p class="text-xs text-[#4A5B73]">Kelola jadwal mingguan Anda atau hasil ekstraksi STAR UMS OCR.</p>
+        <div class="flex justify-between items-center">
+          <div>
+            <h2 class="text-xl font-bold text-slate-900">Jadwal Perkuliahan</h2>
+            <p class="text-xs text-slate-500">Daftar jadwal perkuliahan Hukum yang tersinkronisasi secara real-time.</p>
+          </div>
+          <button onclick="resetToDefaultSchedule()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-xl text-xs font-bold border border-slate-300">
+            🔄 Reset ke Jadwal Default
+          </button>
         </div>
         <div id="schedule-grid" class="grid grid-cols-1 md:grid-cols-5 gap-4"></div>
       </section>
@@ -201,10 +237,10 @@
       <section id="tab-Tasks" class="tab-view hidden space-y-6">
         <div class="flex justify-between items-center">
           <div>
-            <h2 class="text-xl font-bold text-[#1F2D42]">Manajemen Tugas</h2>
-            <p class="text-xs text-[#4A5B73]">Lacak progress pengerjaan tugas akademik Anda.</p>
+            <h2 class="text-xl font-bold text-slate-900">Manajemen Tugas & Deadline</h2>
+            <p class="text-xs text-slate-500">Kelola dan update status pengerjaan tugas akademik Anda.</p>
           </div>
-          <button onclick="openAddTaskModal()" class="bg-[#4A86E8] text-white px-4 py-2 rounded-xl text-xs font-bold shadow-xs hover:bg-[#3B71CA]">+ Add Task</button>
+          <button onclick="openAddTaskModal()" class="bg-blue-600 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-xs hover:bg-blue-700">+ Add Task Baru</button>
         </div>
         <div id="tasks-kanban" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
       </section>
@@ -212,8 +248,8 @@
       <!-- COURSES TAB -->
       <section id="tab-Courses" class="tab-view hidden space-y-6">
         <div>
-          <h2 class="text-xl font-bold text-[#1F2D42]">Mata Kuliah Semester Ini</h2>
-          <p class="text-xs text-[#4A5B73]">Daftar mata kuliah terpindai dari portal STAR UMS.</p>
+          <h2 class="text-xl font-bold text-slate-900">Mata Kuliah Semester Ini</h2>
+          <p class="text-xs text-slate-500">Daftar lengkap mata kuliah yang terdaftar di jadwal Anda.</p>
         </div>
         <div id="courses-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
       </section>
@@ -221,26 +257,32 @@
       <!-- NOTES TAB -->
       <section id="tab-Notes" class="tab-view hidden space-y-6">
         <div class="grid grid-cols-12 gap-8">
-          <div class="col-span-5 bg-white p-6 rounded-3xl border border-[#C2DCF7] space-y-3">
-            <h3 class="text-base font-bold text-[#1F2D42]">Tulis Catatan</h3>
-            <input type="text" id="note-title" placeholder="Judul Catatan..." class="w-full bg-[#EEF4FB] p-3 rounded-2xl text-xs border outline-none font-semibold">
-            <textarea id="note-content" placeholder="Isi catatan..." class="w-full h-32 bg-[#EEF4FB] p-3 rounded-2xl text-xs border outline-none resize-none"></textarea>
-            <button onclick="addNote()" class="w-full py-2.5 bg-[#4A86E8] text-white font-bold rounded-2xl text-xs hover:bg-[#3B71CA]">Simpan Catatan</button>
+          <div class="col-span-12 md:col-span-5 bg-white p-6 rounded-3xl border border-blue-100 space-y-3 shadow-xs">
+            <h3 class="text-base font-bold text-slate-900">Buat Catatan Baru</h3>
+            <input type="text" id="note-title" placeholder="Judul Catatan..." class="w-full bg-slate-50 p-3 rounded-2xl text-xs border border-slate-200 outline-none font-semibold focus:border-blue-500">
+            <textarea id="note-content" placeholder="Tuliskan catatan perkuliahan lengkap di sini..." class="w-full h-40 bg-slate-50 p-3 rounded-2xl text-xs border border-slate-200 outline-none resize-none focus:border-blue-500 font-medium"></textarea>
+            <button onclick="addNoteFirebase()" class="w-full py-3 bg-blue-600 text-white font-bold rounded-2xl text-xs hover:bg-blue-700 shadow-sm">Simpan Catatan ke Firebase</button>
           </div>
-          <div id="notes-list" class="col-span-7 space-y-3"></div>
+          <div class="col-span-12 md:col-span-7 space-y-3">
+            <h3 class="text-base font-bold text-slate-900">Daftar Catatan Tersimpan</h3>
+            <div id="notes-list" class="space-y-3"></div>
+          </div>
         </div>
       </section>
 
       <!-- TIMER TAB -->
       <section id="tab-Timer" class="tab-view hidden space-y-6">
-        <div class="max-w-md mx-auto bg-white p-8 rounded-4xl border border-[#C2DCF7] text-center space-y-6 shadow-xs">
-          <h2 class="text-xl font-bold text-[#1F2D42]">Pomodoro Focus Timer</h2>
-          <div class="w-52 h-52 mx-auto rounded-full bg-gradient-to-br from-[#E2EEF9] to-[#C2DCF7] flex items-center justify-center border-8 border-white shadow-inner">
-            <span id="timer-display" class="text-4xl font-extrabold text-[#1F2D42]">25:00</span>
+        <div class="max-w-md mx-auto bg-white p-8 rounded-4xl border border-blue-100 text-center space-y-6 shadow-xs">
+          <div>
+            <h2 class="text-xl font-bold text-slate-900">Pomodoro Focus Timer</h2>
+            <p class="text-xs text-slate-500 mt-1">25 Menit Sesi Belajar Fokus & 5 Menit Istirahat</p>
+          </div>
+          <div class="w-56 h-56 mx-auto rounded-full bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center border-8 border-white shadow-inner">
+            <span id="timer-display" class="text-5xl font-extrabold text-slate-900">25:00</span>
           </div>
           <div class="flex justify-center gap-3">
-            <button id="timer-btn" onclick="toggleTimer()" class="px-6 py-3 bg-[#4A86E8] text-white font-bold text-xs rounded-2xl hover:bg-[#3B71CA]">Mulai Belajar</button>
-            <button onclick="resetTimer()" class="p-3 bg-[#EEF4FB] text-[#1F2D42] rounded-2xl hover:bg-[#E2EEF9]">Reset</button>
+            <button id="timer-btn" onclick="toggleTimer()" class="px-8 py-3 bg-blue-600 text-white font-bold text-xs rounded-2xl hover:bg-blue-700 shadow-sm">Mulai Belajar</button>
+            <button onclick="resetTimer()" class="px-5 py-3 bg-slate-100 text-slate-700 font-bold text-xs rounded-2xl hover:bg-slate-200 border border-slate-200">Reset</button>
           </div>
         </div>
       </section>
@@ -248,17 +290,17 @@
       <!-- PROGRESS TAB -->
       <section id="tab-Progress" class="tab-view hidden space-y-6">
         <div>
-          <h2 class="text-xl font-bold text-[#1F2D42]">My Academic Progress</h2>
-          <p class="text-xs text-[#4A5B73]">Statistik real-time waktu dan penyelesaian tugas.</p>
+          <h2 class="text-xl font-bold text-slate-900">My Academic Progress</h2>
+          <p class="text-xs text-slate-500">Statistik real-time aktivitas perkuliahan dan tugas Anda.</p>
         </div>
-        <div class="grid grid-cols-2 gap-6">
-          <div class="bg-white p-6 rounded-3xl border border-[#C2DCF7] space-y-2">
-            <p class="text-xs font-bold text-[#4A5B73]">Total Waktu Belajar</p>
-            <h3 id="stat-study-mins" class="text-3xl font-extrabold text-[#4A86E8]">145 Menit</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="bg-white p-6 rounded-3xl border border-blue-100 space-y-2 shadow-xs">
+            <p class="text-xs font-bold text-slate-500">Total Sesi Waktu Belajar</p>
+            <h3 id="stat-study-mins" class="text-3xl font-extrabold text-blue-600">0 Menit</h3>
           </div>
-          <div class="bg-white p-6 rounded-3xl border border-[#C2DCF7] space-y-2">
-            <p class="text-xs font-bold text-[#4A5B73]">Penyelesaian Tugas</p>
-            <h3 id="stat-rate" class="text-3xl font-extrabold text-[#1F2D42]">100%</h3>
+          <div class="bg-white p-6 rounded-3xl border border-blue-100 space-y-2 shadow-xs">
+            <p class="text-xs font-bold text-slate-500">Rasio Penyelesaian Tugas</p>
+            <h3 id="stat-rate" class="text-3xl font-extrabold text-slate-900">0%</h3>
           </div>
         </div>
       </section>
@@ -267,64 +309,141 @@
   </div>
 
   <!-- MODAL: ADD TASK -->
-  <div id="modal-add-task" class="hidden fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+  <div id="modal-add-task" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-md rounded-3xl p-6 shadow-xl space-y-4">
       <div class="flex justify-between items-center">
-        <h3 class="text-base font-bold text-[#1F2D42]">Tambah Tugas Baru</h3>
-        <button onclick="closeAddTaskModal()"><i data-lucide="x" class="w-4 h-4"></i></button>
+        <h3 class="text-base font-bold text-slate-900">Tambah Tugas Baru</h3>
+        <button onclick="closeAddTaskModal()"><i data-lucide="x" class="w-4 h-4 text-slate-500"></i></button>
       </div>
       <div class="space-y-3 text-xs">
-        <input type="text" id="task-input-title" placeholder="Judul Tugas..." class="w-full bg-[#EEF4FB] p-3 rounded-2xl border outline-none font-semibold">
-        <input type="date" id="task-input-date" class="w-full bg-[#EEF4FB] p-3 rounded-2xl border outline-none font-semibold">
-        <button onclick="saveNewTask()" class="w-full py-3 bg-[#4A86E8] text-white font-bold rounded-2xl hover:bg-[#3B71CA]">Simpan Tugas</button>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Judul Tugas</label>
+          <input type="text" id="task-input-title" placeholder="Misal: Resume Jurnal Hukum..." class="w-full bg-slate-50 p-3 rounded-2xl border border-slate-200 outline-none font-semibold focus:border-blue-500">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Mata Kuliah</label>
+          <input type="text" id="task-input-course" placeholder="Misal: Hukum Dagang" class="w-full bg-slate-50 p-3 rounded-2xl border border-slate-200 outline-none font-semibold focus:border-blue-500">
+        </div>
+        <div>
+          <label class="block font-bold text-slate-700 mb-1">Tanggal Deadline</label>
+          <input type="date" id="task-input-date" class="w-full bg-slate-50 p-3 rounded-2xl border border-slate-200 outline-none font-semibold focus:border-blue-500">
+        </div>
+        <button onclick="saveNewTaskFirebase()" class="w-full py-3 bg-blue-600 text-white font-bold rounded-2xl hover:bg-blue-700 shadow-sm mt-2">Simpan Task ke Firebase</button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL: OCR SCANNER (STAR UMS) -->
-  <div id="modal-ocr" class="hidden fixed inset-0 bg-black/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+  <!-- MODAL: OCR SCANNER IMPORT -->
+  <div id="modal-ocr" class="hidden fixed inset-0 bg-slate-900/40 backdrop-blur-xs z-50 flex items-center justify-center p-4">
     <div class="bg-white w-full max-w-md rounded-3xl p-6 shadow-xl space-y-4 text-center">
-      <h3 class="text-base font-bold text-[#1F2D42]">OCR Scanner STAR UMS</h3>
-      <p class="text-xs text-[#4A5B73]">Simulasi pemindaian gambar jadwal dari portal star.ums.ac.id</p>
-      <div class="border-2 border-dashed border-[#4A86E8] p-8 rounded-2xl bg-[#EEF4FB]">
-        <button onclick="runOcrSimulation()" id="ocr-btn" class="px-4 py-2.5 bg-[#4A86E8] text-white font-bold text-xs rounded-xl hover:bg-[#3B71CA]">Mulai Pindai Jadwal UMS</button>
+      <div class="flex justify-between items-center">
+        <h3 class="text-base font-bold text-slate-900">OCR Scanner Jadwal</h3>
+        <button onclick="closeOcrModal()"><i data-lucide="x" class="w-4 h-4 text-slate-500"></i></button>
+      </div>
+      <p class="text-xs text-slate-500">Pilih gambar file jadwal kuliah Anda (JPG/PNG) untuk mengekstrak data otomatis.</p>
+      <div class="border-2 border-dashed border-blue-300 p-8 rounded-2xl bg-blue-50/50 space-y-3">
+        <i data-lucide="image" class="w-8 h-8 text-blue-500 mx-auto"></i>
+        <button onclick="runOcrSimulation()" id="ocr-btn" class="px-5 py-2.5 bg-blue-600 text-white font-bold text-xs rounded-xl hover:bg-blue-700 shadow-xs">Simulasi Pindai & Tambah Jadwal</button>
       </div>
     </div>
   </div>
 
-  <!-- JAVASCRIPT APPLICATION LOGIC -->
+  <!-- JAVASCRIPT APPLICATION LOGIC & FIREBASE REALTIME DB -->
   <script>
-    // Lucide Icon Initialization
+    // 1. FIREBASE INITIALIZATION
+    const firebaseConfig = {
+      apiKey: "AIzaSyDWIdb2BHKOSVQ4EQCy3SVA6QwAW_qggdA",
+      authDomain: "studybloom-noy.firebaseapp.com",
+      databaseURL: "https://studybloom-noy-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "studybloom-noy",
+      storageBucket: "studybloom-noy.firebasestorage.app",
+      messagingSenderId: "758745076071",
+      appId: "1:758745076071:web:a7cba0920635266d3c5fc2"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+
+    // Init Lucide Icons
     lucide.createIcons();
 
-    // App State Management (UMS Courses)
-    let courses = JSON.parse(localStorage.getItem('sb_courses')) || [
-      { id: 'c1', code: 'LAW3231407', name: 'Hukum Administrasi Negara', lecturer: 'Dr. Ahmad Sanusi', room: 'R.302', day: 'Senin', time: '07:00 - 08:40' },
-      { id: 'c2', code: 'LAW3231408', name: 'Hukum Dagang', lecturer: 'Prof. Endang Rahayu', room: 'R.204', day: 'Senin', time: '09:00 - 10:40' },
-      { id: 'c3', code: 'LAW3231409', name: 'Hukum Acara Pidana', lecturer: 'Bambang Tri, M.Hum.', room: 'R.105', day: 'Selasa', time: '07:00 - 08:40' },
+    // Default Schedule Data Requested
+    const defaultSchedule = [
+      // SENIN
+      { id: 'sch_1', day: 'Senin', time: 'Jam ke-7–8', name: 'Hukum Administrasi Negara', code: 'LAW3231407' },
+      { id: 'sch_2', day: 'Senin', time: 'Jam ke-9–10', name: 'Hukum Dagang', code: 'LAW3231408' },
+      // SELASA
+      { id: 'sch_3', day: 'Selasa', time: 'Jam ke-7–8', name: 'Hukum Acara Pidana', code: 'LAW3231409' },
+      { id: 'sch_4', day: 'Selasa', time: 'Jam ke-9–10', name: 'Hukum Dagang', code: 'LAW3231408' },
+      { id: 'sch_5', day: 'Selasa', time: 'Jam ke-11–12', name: 'Hukum Adat', code: 'LAW3231204' },
+      // RABU
+      { id: 'sch_6', day: 'Rabu', time: 'Jam ke-1–2', name: 'Islam dan IPTEK', code: 'LAW1231203' },
+      { id: 'sch_7', day: 'Rabu', time: 'Jam ke-3–4', name: 'Penalaran Hukum', code: 'LAW3231202' },
+      { id: 'sch_8', day: 'Rabu', time: 'Jam ke-7–8', name: 'Hukum Administrasi Negara', code: 'LAW3231407' },
+      { id: 'sch_9', day: 'Rabu', time: 'Jam ke-9–10', name: 'Metodologi Interpretasi Hukum', code: 'LAW3231203' },
+      // KAMIS
+      { id: 'sch_10', day: 'Kamis', time: 'Jam ke-7–8', name: 'Hukum Acara Pidana', code: 'LAW3231409' },
+      { id: 'sch_11', day: 'Kamis', time: 'Jam ke-5–6', name: 'Kriminologi', code: 'LAW3231218' },
+      // JUMAT
+      { id: 'sch_12', day: 'Jumat', time: 'Jam ke-11–12', name: 'Hukum Konstitusi', code: 'LAW3231215' }
     ];
 
-    let tasks = JSON.parse(localStorage.getItem('sb_tasks')) || [
-      { id: 't1', title: 'Analisis Sengketa PTUN', courseName: 'Hukum Administrasi Negara', dueDate: '2026-10-28', status: 'In Progress' },
-      { id: 't2', title: 'Resume Jurnal KUHD', courseName: 'Hukum Dagang', dueDate: '2026-10-29', status: 'To Do' }
-    ];
+    // App Global State Variable
+    let appState = {
+      schedule: defaultSchedule,
+      tasks: [
+        { id: 't1', title: 'Resume Hukum Administrasi Negara', course: 'Hukum Administrasi Negara', dueDate: '2026-11-02', status: 'In Progress' },
+        { id: 't2', title: 'Studi Kasus Hukum Dagang', course: 'Hukum Dagang', dueDate: '2026-11-05', status: 'To Do' }
+      ],
+      notes: [
+        { id: 'n1', title: 'Prinsip Presumption of Innocence', content: 'Diatur tegas dalam KUHAP sebagai asas utama perlindungan hak tersangka.' }
+      ],
+      quickNote: '',
+      studyMins: 45
+    };
 
-    let notes = JSON.parse(localStorage.getItem('sb_notes')) || [
-      { id: 'n1', title: 'Asas Hukum Acara Pidana', content: 'Presumption of innocence diatur dalam Pasal 8 KUHAP.' }
-    ];
+    // Realtime Database Sync Listener
+    const appRef = db.ref('studybloom_data');
 
-    let studyMins = parseInt(localStorage.getItem('sb_study_mins')) || 145;
+    appRef.on('value', (snapshot) => {
+      const data = snapshot.val();
+      const syncStatus = document.getElementById('sync-status');
 
-    // Save State Helper
-    function saveData() {
-      localStorage.setItem('sb_courses', JSON.stringify(courses));
-      localStorage.setItem('sb_tasks', JSON.stringify(tasks));
-      localStorage.setItem('sb_notes', JSON.stringify(notes));
-      localStorage.setItem('sb_study_mins', studyMins);
+      if (data) {
+        appState = {
+          schedule: data.schedule || defaultSchedule,
+          tasks: data.tasks ? Object.values(data.tasks) : [],
+          notes: data.notes ? Object.values(data.notes) : [],
+          quickNote: data.quickNote || '',
+          studyMins: data.studyMins || 0
+        };
+      } else {
+        // Initialize Default Database Value
+        pushStateToFirebase();
+      }
+
+      syncStatus.className = "px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-[11px] font-bold flex items-center gap-2";
+      syncStatus.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-500"></span><span>Firebase Realtime Connected</span>`;
+
       renderAll();
+    }, (error) => {
+      console.error(error);
+      const syncStatus = document.getElementById('sync-status');
+      syncStatus.className = "px-3 py-1.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-[11px] font-bold flex items-center gap-2";
+      syncStatus.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-500"></span><span>Gagal Konek Firebase</span>`;
+    });
+
+    function pushStateToFirebase() {
+      appRef.set({
+        schedule: appState.schedule,
+        tasks: appState.tasks,
+        notes: appState.notes,
+        quickNote: appState.quickNote,
+        studyMins: appState.studyMins
+      });
     }
 
-    // Toast Helper
+    // UI Toast Notification
     function showToast(msg) {
       const t = document.getElementById('toast');
       document.getElementById('toast-message').innerText = msg;
@@ -336,62 +455,78 @@
     function switchTab(tabName) {
       document.querySelectorAll('.tab-view').forEach(el => el.classList.add('hidden'));
       document.querySelectorAll('.nav-btn').forEach(el => {
-        el.classList.remove('bg-[#C2DCF7]', 'text-[#1F2D42]');
-        el.classList.add('text-[#4A5B73]');
+        el.classList.remove('bg-blue-600', 'text-white', 'shadow-sm');
+        el.classList.add('text-slate-600');
       });
 
       document.getElementById(`tab-${tabName}`).classList.remove('hidden');
       const activeBtn = document.getElementById(`nav-${tabName}`);
       if(activeBtn) {
-        activeBtn.classList.add('bg-[#C2DCF7]', 'text-[#1F2D42]');
-        activeBtn.classList.remove('text-[#4A5B73]');
+        activeBtn.classList.add('bg-blue-600', 'text-white', 'shadow-sm');
+        activeBtn.classList.remove('text-slate-600');
       }
     }
 
-    // Render Logic
+    // Render Logic across views
     function renderAll() {
-      // Quick Note Input
-      document.getElementById('quick-note-input').value = localStorage.getItem('sb_quicknote') || '';
+      // Quick Note Input Sync
+      const qInput = document.getElementById('quick-note-input');
+      if (document.activeElement !== qInput) {
+        qInput.value = appState.quickNote || '';
+      }
 
       // Dashboard Stats
-      const pending = tasks.filter(t => t.status !== 'Completed').length;
-      const completed = tasks.filter(t => t.status === 'Completed').length;
-      document.getElementById('stat-active-tasks').innerText = pending;
-      document.getElementById('stat-completed-tasks').innerText = completed;
+      const activeCount = appState.tasks.filter(t => t.status !== 'Completed').length;
+      const completedCount = appState.tasks.filter(t => t.status === 'Completed').length;
+      document.getElementById('stat-active-tasks').innerText = activeCount;
+      document.getElementById('stat-completed-tasks').innerText = completedCount;
+      document.getElementById('stat-high-priority').innerText = activeCount;
 
       // Dashboard Today Schedule
       const schedContainer = document.getElementById('today-schedule-list');
-      schedContainer.innerHTML = courses.slice(0, 2).map(c => `
-        <div class="flex items-center justify-between p-4 rounded-2xl bg-[#EEF4FB] border border-[#C2DCF7]">
-          <div>
-            <h4 class="text-xs font-bold text-[#1F2D42]">${c.name}</h4>
-            <p class="text-[11px] font-semibold text-[#4A5B73]">${c.code} • ${c.room}</p>
+      const todaySchedule = appState.schedule.filter(s => s.day === 'Senin'); // Display Monday by Default
+
+      if (todaySchedule.length > 0) {
+        schedContainer.innerHTML = todaySchedule.map(c => `
+          <div class="flex items-center justify-between p-4 rounded-2xl bg-slate-50 border border-slate-200 hover:border-blue-300 transition-all">
+            <div>
+              <h4 class="text-xs font-bold text-slate-900">${c.name}</h4>
+              <p class="text-[11px] font-semibold text-blue-600 mt-0.5">${c.code}</p>
+            </div>
+            <span class="text-xs font-bold text-slate-700 bg-white px-3 py-1.5 rounded-xl border border-slate-200 shadow-2xs">${c.time}</span>
           </div>
-          <span class="text-xs font-bold text-[#1F2D42] bg-white px-3 py-1 rounded-xl border border-[#C2DCF7]">${c.time}</span>
-        </div>
-      `).join('');
+        `).join('');
+      } else {
+        schedContainer.innerHTML = `<p class="text-xs text-slate-500 italic">Tidak ada jadwal perkuliahan hari ini.</p>`;
+      }
 
       // Mini Calendar
       const cal = document.getElementById('mini-calendar');
-      let calHtml = ['M','S','S','R','K','J','S'].map(d => `<div class="py-1">${d}</div>`).join('');
+      let calHtml = ['M','S','S','R','K','J','S'].map(d => `<div class="py-1 text-slate-400">${d}</div>`).join('');
       for(let i=1; i<=31; i++) {
-        calHtml += `<div class="py-1 rounded-lg ${i === 28 ? 'bg-[#4A86E8] text-white font-bold' : ''}">${i}</div>`;
+        calHtml += `<div class="py-1 rounded-xl text-xs font-semibold ${i === 28 ? 'bg-blue-600 text-white font-bold shadow-xs' : 'hover:bg-blue-50'}">${i}</div>`;
       }
       cal.innerHTML = calHtml;
 
-      // Schedule View
-      const days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jum\'at'];
+      // Full Weekly Schedule View
+      const days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat'];
       document.getElementById('schedule-grid').innerHTML = days.map(d => {
-        const dCourses = courses.filter(c => c.day === d);
+        const dCourses = appState.schedule.filter(c => c.day === d);
         return `
-          <div class="bg-white p-4 rounded-3xl border border-[#C2DCF7] space-y-2">
-            <h4 class="text-xs font-bold text-[#1F2D42] border-b pb-2">${d}</h4>
-            ${dCourses.map(c => `
-              <div class="p-2.5 bg-[#EEF4FB] rounded-xl text-[11px] border border-[#C2DCF7]/50">
-                <p class="font-bold text-[#1F2D42]">${c.name}</p>
-                <p class="text-[#4A5B73] font-semibold">${c.time}</p>
+          <div class="bg-white p-4 rounded-3xl border border-blue-100 space-y-3 shadow-xs flex flex-col justify-between">
+            <div class="space-y-2">
+              <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+                <h4 class="text-xs font-extrabold text-slate-900">${d}</h4>
+                <span class="text-[10px] font-bold bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full">${dCourses.length} Kelas</span>
               </div>
-            `).join('') || '<p class="text-[10px] text-[#4A5B73] italic">Tidak ada kelas</p>'}
+              ${dCourses.map(c => `
+                <div class="p-3 bg-slate-50 rounded-2xl text-[11px] border border-slate-200/80 space-y-1 hover:border-blue-300 transition-all">
+                  <p class="font-bold text-slate-900 leading-snug">${c.name}</p>
+                  <p class="text-blue-600 font-bold text-[10px]">${c.code}</p>
+                  <p class="text-slate-500 font-medium text-[10px] bg-white px-2 py-0.5 rounded-lg border border-slate-200 inline-block mt-1">${c.time}</p>
+                </div>
+              `).join('') || '<p class="text-[10px] text-slate-400 italic py-2">Tidak ada perkuliahan</p>'}
+            </div>
           </div>
         `;
       }).join('');
@@ -399,109 +534,184 @@
       // Tasks View (Kanban)
       const statuses = ['To Do', 'In Progress', 'Completed'];
       document.getElementById('tasks-kanban').innerHTML = statuses.map(s => {
-        const sTasks = tasks.filter(t => t.status === s);
+        const sTasks = appState.tasks.filter(t => t.status === s);
         return `
-          <div class="bg-white p-5 rounded-3xl border border-[#C2DCF7] space-y-3">
-            <h3 class="text-xs font-bold text-[#1F2D42] border-b pb-2 flex justify-between">
+          <div class="bg-white p-5 rounded-3xl border border-blue-100 space-y-3 shadow-xs">
+            <h3 class="text-xs font-bold text-slate-900 border-b border-slate-100 pb-2 flex justify-between items-center">
               <span>${s}</span>
-              <span class="bg-[#C2DCF7] text-[#1F2D42] px-2 rounded-full font-bold">${sTasks.length}</span>
+              <span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded-full text-[10px] font-bold">${sTasks.length}</span>
             </h3>
-            ${sTasks.map(t => `
-              <div class="p-3 bg-[#EEF4FB] rounded-2xl text-xs space-y-1 border border-[#C2DCF7]/60">
-                <p class="font-bold text-[#1F2D42]">${t.title}</p>
-                <p class="text-[10px] text-[#4A5B73] font-semibold">${t.dueDate}</p>
-                <button onclick="cycleTaskStatus('${t.id}')" class="text-[10px] text-[#4A86E8] font-bold hover:underline">Ubah Status ➔</button>
-              </div>
-            `).join('')}
+            <div class="space-y-2">
+              ${sTasks.map(t => `
+                <div class="p-3.5 bg-slate-50 rounded-2xl text-xs space-y-1.5 border border-slate-200">
+                  <p class="font-bold text-slate-900">${t.title}</p>
+                  <p class="text-[10px] text-slate-500 font-semibold">${t.course || 'Umum'} • Deadline: ${t.dueDate || '-'}</p>
+                  <div class="pt-1 flex justify-between items-center">
+                    <button onclick="cycleTaskStatus('${t.id}')" class="text-[10px] text-blue-600 font-bold hover:underline flex items-center gap-1">
+                      Ubah Status ➔
+                    </button>
+                    <button onclick="deleteTaskFirebase('${t.id}')" class="text-[10px] text-rose-500 font-bold hover:underline">Hapus</button>
+                  </div>
+                </div>
+              `).join('') || '<p class="text-[11px] text-slate-400 italic py-2">Tidak ada tugas</p>'}
+            </div>
           </div>
         `;
       }).join('');
 
-      // Courses View
-      document.getElementById('courses-grid').innerHTML = courses.map(c => `
-        <div class="bg-white p-5 rounded-3xl border border-[#C2DCF7] space-y-2">
-          <span class="text-[10px] font-bold bg-[#C2DCF7] text-[#1F2D42] px-2 py-0.5 rounded-md">${c.code}</span>
-          <h4 class="text-xs font-bold text-[#1F2D42]">${c.name}</h4>
-          <p class="text-[11px] text-[#4A5B73] font-semibold">${c.lecturer}</p>
+      // Courses View (Unique Course List)
+      const uniqueCourses = [];
+      const courseMap = new Map();
+      appState.schedule.forEach(s => {
+        if(!courseMap.has(s.code)) {
+          courseMap.set(s.code, true);
+          uniqueCourses.push(s);
+        }
+      });
+
+      document.getElementById('courses-grid').innerHTML = uniqueCourses.map(c => `
+        <div class="bg-white p-5 rounded-3xl border border-blue-100 space-y-2 shadow-xs hover:shadow-md transition-all">
+          <span class="text-[10px] font-bold bg-blue-100 text-blue-700 px-2.5 py-1 rounded-lg">${c.code}</span>
+          <h4 class="text-sm font-bold text-slate-900 mt-2">${c.name}</h4>
+          <p class="text-[11px] text-slate-500 font-semibold">Fakultas Hukum</p>
         </div>
       `).join('');
 
       // Notes View
-      document.getElementById('notes-list').innerHTML = notes.map(n => `
-        <div class="bg-white p-4 rounded-3xl border border-[#C2DCF7] space-y-1">
-          <h4 class="text-xs font-bold text-[#1F2D42]">${n.title}</h4>
-          <p class="text-xs text-[#4A5B73] font-medium">${n.content}</p>
+      document.getElementById('notes-list').innerHTML = appState.notes.map(n => `
+        <div class="bg-white p-4 rounded-3xl border border-blue-100 space-y-1.5 shadow-xs">
+          <div class="flex justify-between items-center">
+            <h4 class="text-xs font-bold text-slate-900">${n.title}</h4>
+            <button onclick="deleteNoteFirebase('${n.id}')" class="text-[10px] text-rose-500 font-bold hover:underline">Hapus</button>
+          </div>
+          <p class="text-xs text-slate-600 font-medium leading-relaxed">${n.content}</p>
         </div>
-      `).join('');
+      `).join('') || '<p class="text-xs text-slate-400 italic">Belum ada catatan disimpan.</p>';
+
+      // Progress View
+      document.getElementById('stat-study-mins').innerText = `${appState.studyMins} Menit`;
+      const totalTasks = appState.tasks.length;
+      const rate = totalTasks > 0 ? Math.round((completedCount / totalTasks) * 100) : 0;
+      document.getElementById('stat-rate').innerText = `${rate}%`;
     }
 
-    // Quick Note Functions
-    function saveQuickNote(val) {
-      localStorage.setItem('sb_quicknote', val);
+    // Quick Note Firebase Action
+    let saveTimeout = null;
+    function saveQuickNoteFirebase(val) {
+      appState.quickNote = val;
+      clearTimeout(saveTimeout);
+      saveTimeout = setTimeout(() => {
+        pushStateToFirebase();
+      }, 800);
     }
 
     function convertQuickNoteToTask() {
       const val = document.getElementById('quick-note-input').value;
       if(!val.trim()) return;
-      tasks.push({
+      
+      const newTask = {
         id: `t_${Date.now()}`,
-        title: val.slice(0, 30),
-        dueDate: '2026-10-30',
+        title: val.slice(0, 40),
+        course: 'Catatan Cepat',
+        dueDate: '2026-11-01',
         status: 'To Do'
-      });
+      };
+
+      appState.tasks.push(newTask);
+      appState.quickNote = '';
       document.getElementById('quick-note-input').value = '';
-      saveQuickNote('');
-      saveData();
+      pushStateToFirebase();
       showToast('✅ Catatan dikonversi menjadi Task baru!');
     }
 
-    // Modal Helpers
+    // Modal Handlers
     function openAddTaskModal() { document.getElementById('modal-add-task').classList.remove('hidden'); }
     function closeAddTaskModal() { document.getElementById('modal-add-task').classList.add('hidden'); }
     function openOcrModal() { document.getElementById('modal-ocr').classList.remove('hidden'); }
+    function closeOcrModal() { document.getElementById('modal-ocr').classList.add('hidden'); }
 
-    function saveNewTask() {
+    function saveNewTaskFirebase() {
       const title = document.getElementById('task-input-title').value;
+      const course = document.getElementById('task-input-course').value;
       const date = document.getElementById('task-input-date').value;
+      
       if(!title) return;
-      tasks.push({ id: `t_${Date.now()}`, title, dueDate: date || '2026-10-30', status: 'To Do' });
-      closeAddTaskModal();
-      saveData();
-      showToast('📝 Tugas baru ditambahkan!');
-    }
 
-    function runOcrSimulation() {
-      const btn = document.getElementById('ocr-btn');
-      btn.innerText = 'Memproses STAR UMS OCR...';
-      setTimeout(() => {
-        courses.push({ id: `c_${Date.now()}`, code: 'LAW3231218', name: 'Kriminologi', lecturer: 'Dosen Kriminologi', room: 'R.102', day: 'Kamis', time: '05–06' });
-        btn.innerText = 'Mulai Pindai Jadwal UMS';
-        document.getElementById('modal-ocr').classList.add('hidden');
-        saveData();
-        showToast('✨ OCR STAR UMS Berhasil! Jadwal Kriminologi ditambahkan.');
-      }, 1200);
+      appState.tasks.push({
+        id: `t_${Date.now()}`,
+        title,
+        course: course || 'Umum',
+        dueDate: date || '2026-11-01',
+        status: 'To Do'
+      });
+
+      closeAddTaskModal();
+      pushStateToFirebase();
+      showToast('📝 Tugas baru tersimpan secara real-time!');
     }
 
     function cycleTaskStatus(id) {
-      tasks = tasks.map(t => {
+      appState.tasks = appState.tasks.map(t => {
         if(t.id === id) {
           const next = t.status === 'To Do' ? 'In Progress' : t.status === 'In Progress' ? 'Completed' : 'To Do';
           return { ...t, status: next };
         }
         return t;
       });
-      saveData();
+      pushStateToFirebase();
     }
 
-    function addNote() {
+    function deleteTaskFirebase(id) {
+      appState.tasks = appState.tasks.filter(t => t.id !== id);
+      pushStateToFirebase();
+      showToast('🗑️ Tugas berhasil dihapus.');
+    }
+
+    function addNoteFirebase() {
       const title = document.getElementById('note-title').value;
       const content = document.getElementById('note-content').value;
       if(!title || !content) return;
-      notes.push({ id: `n_${Date.now()}`, title, content });
+
+      appState.notes.push({
+        id: `n_${Date.now()}`,
+        title,
+        content
+      });
+
       document.getElementById('note-title').value = '';
       document.getElementById('note-content').value = '';
-      saveData();
-      showToast('📓 Catatan berhasil disimpan!');
+      pushStateToFirebase();
+      showToast('📓 Catatan baru tersimpan di Firebase!');
+    }
+
+    function deleteNoteFirebase(id) {
+      appState.notes = appState.notes.filter(n => n.id !== id);
+      pushStateToFirebase();
+      showToast('🗑️ Catatan dihapus.');
+    }
+
+    function resetToDefaultSchedule() {
+      appState.schedule = defaultSchedule;
+      pushStateToFirebase();
+      showToast('🔄 Jadwal telah dikembalikan ke default.');
+    }
+
+    function runOcrSimulation() {
+      const btn = document.getElementById('ocr-btn');
+      btn.innerText = 'Mengekstrak Gambar Jadwal...';
+      setTimeout(() => {
+        appState.schedule.push({
+          id: `sch_${Date.now()}`,
+          day: 'Jumat',
+          time: 'Jam ke-1–2',
+          name: 'Filsafat Hukum',
+          code: 'LAW3231500'
+        });
+        btn.innerText = 'Simulasi Pindai & Tambah Jadwal';
+        closeOcrModal();
+        pushStateToFirebase();
+        showToast('✨ OCR Berhasil! Mata Kuliah Filsafat Hukum ditambahkan.');
+      }, 1200);
     }
 
     // Pomodoro Timer Logic
@@ -513,22 +723,22 @@
       const btn = document.getElementById('timer-btn');
       if(!isTimerRunning) {
         isTimerRunning = true;
-        btn.innerText = 'Pause';
+        btn.innerText = 'Pause Belajar';
         timerInterval = setInterval(() => {
           timerSecs--;
           updateTimerDisplay();
           if(timerSecs <= 0) {
             clearInterval(timerInterval);
-            studyMins += 25;
-            saveData();
-            showToast('⏱️ Sesi belajar 25 menit selesai!');
+            appState.studyMins += 25;
+            pushStateToFirebase();
+            showToast('⏱️ Sesi belajar 25 menit selesai! Terakumulasi di Progress.');
             resetTimer();
           }
         }, 1000);
       } else {
         isTimerRunning = false;
         clearInterval(timerInterval);
-        btn.innerText = 'Lanjutkan';
+        btn.innerText = 'Lanjutkan Belajar';
       }
     }
 
@@ -543,7 +753,9 @@
     function updateTimerDisplay() {
       const m = Math.floor(timerSecs / 60).toString().padStart(2, '0');
       const s = (timerSecs % 60).toString().padStart(2, '0');
-      document.getElementById('timer-display').innerText = `${m}:${s}`;
+      const displayStr = `${m}:${s}`;
+      document.getElementById('timer-display').innerText = displayStr;
+      document.getElementById('dash-timer-display').innerText = displayStr;
     }
 
     // Global Search
@@ -552,9 +764,8 @@
       switchTab('Tasks');
     }
 
-    // Initial Load
+    // Initial Active View
     switchTab('Dashboard');
-    renderAll();
   </script>
 </body>
 </html>
