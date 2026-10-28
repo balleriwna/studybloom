@@ -98,9 +98,6 @@
         <button onclick="switchTab('Notes')" id="nav-Notes" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-semibold text-slate-600 hover:bg-blue-50 transition-all">
           <i data-lucide="edit-3" class="w-5 h-5"></i> My Notes
         </button>
-        <button onclick="switchTab('Materials')" id="nav-Materials" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-semibold text-slate-600 hover:bg-blue-50 transition-all">
-          <i data-lucide="folder" class="w-5 h-5"></i> Study Materials
-        </button>
         <button onclick="switchTab('Timer')" id="nav-Timer" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-semibold text-slate-600 hover:bg-blue-50 transition-all">
           <i data-lucide="clock" class="w-5 h-5"></i> Focus Timer
         </button>
@@ -272,28 +269,6 @@
           <p class="text-xs text-slate-500">Daftar lengkap mata kuliah yang terdaftar di jadwal perkuliahan Anda.</p>
         </div>
         <div id="courses-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6"></div>
-      </section>
-
-      <!-- STUDY MATERIALS TAB -->
-      <section id="tab-Materials" class="tab-view hidden space-y-6">
-        <div>
-          <h2 class="text-xl font-bold text-slate-900">Study Materials (Materi Pembelajaran)</h2>
-          <p class="text-xs text-slate-500">Perpustakaan digital untuk modul, e-book, dan artikel jurnal perkuliahan.</p>
-        </div>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div class="bg-white p-5 rounded-3xl border border-blue-100 space-y-3 shadow-xs">
-            <div class="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">📚</div>
-            <h4 class="text-sm font-bold text-slate-900">Modul Hukum Administrasi Negara</h4>
-            <p class="text-xs text-slate-500">Format: PDF • Terakhir Diperbarui: 2026-10-20</p>
-            <button onclick="showToast('📥 Mengunduh Modul HAN...')" class="w-full py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold rounded-xl text-xs transition-all border border-blue-200">Unduh Materi</button>
-          </div>
-          <div class="bg-white p-5 rounded-3xl border border-blue-100 space-y-3 shadow-xs">
-            <div class="w-10 h-10 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold">⚖️</div>
-            <h4 class="text-sm font-bold text-slate-900">Draf Kitab Undang-Undang Hukum Dagang</h4>
-            <p class="text-xs text-slate-500">Format: DOCX • Terakhir Diperbarui: 2026-10-24</p>
-            <button onclick="showToast('📥 Mengunduh KUHD...')" class="w-full py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 font-bold rounded-xl text-xs transition-all border border-blue-200">Unduh Materi</button>
-          </div>
-        </div>
       </section>
 
       <!-- NOTES TAB -->
