@@ -82,14 +82,14 @@
       </nav>
     </div>
 
-    <!-- User Profile Widget -->
+    <!-- User Profile Widget (Diubah ke Noy) -->
     <div class="p-3 bg-[#F4F9FD] rounded-2xl flex items-center gap-3">
       <div class="w-9 h-9 rounded-full bg-[#A7C7E7] text-white flex items-center justify-center font-bold text-sm">
-        NR
+        N
       </div>
       <div class="overflow-hidden">
-        <h4 class="text-xs font-bold text-[#344767] truncate">Naladhipa Rawnie</h4>
-        <p class="text-[11px] text-[#67748E] truncate">UNS • Hukum</p>
+        <h4 class="text-xs font-bold text-[#344767] truncate">Noy</h4>
+        <p class="text-[11px] text-[#67748E] truncate">UNS • Student</p>
       </div>
     </div>
   </aside>
@@ -124,7 +124,7 @@
           <div class="col-span-12 lg:col-span-8 space-y-6">
             <div class="bg-gradient-to-r from-[#D6E8F5] via-[#EAF4FC] to-white p-7 rounded-3xl border border-[#EAF4FC] shadow-xs">
               <span class="text-xs font-bold uppercase tracking-wider text-[#67748E]">Rabu, 28 Oktober 2026</span>
-              <h1 class="text-2xl font-bold text-[#344767] mt-1">Selamat Pagi, Nala! 👋</h1>
+              <h1 class="text-2xl font-bold text-[#344767] mt-1">Selamat Pagi, Noy! 👋</h1>
               <p class="text-sm text-[#67748E] mt-1">Kelola jadwal perkuliahan, deadline tugas, dan produktivitas belajar Anda dalam satu tempat.</p>
             </div>
 
@@ -177,7 +177,7 @@
             </div>
 
             <!-- Pomodoro Link Widget -->
-            <div className="bg-gradient-to-br from-[#EAF4FC] to-white p-6 rounded-3xl border border-[#EAF4FC] text-center space-y-3">
+            <div class="bg-gradient-to-br from-[#EAF4FC] to-white p-6 rounded-3xl border border-[#EAF4FC] text-center space-y-3">
               <span class="text-xs font-bold text-[#67748E] uppercase tracking-wider block">Focus Session</span>
               <h2 class="text-3xl font-extrabold text-[#344767] my-2">25:00</h2>
               <button onclick="switchTab('Timer')" class="w-full py-2.5 bg-[#A7C7E7] text-white font-bold text-xs rounded-2xl hover:bg-[#5B86E5] shadow-xs transition-all">
@@ -192,7 +192,7 @@
       <section id="tab-Schedule" class="tab-view hidden space-y-6">
         <div>
           <h2 class="text-xl font-bold text-[#344767]">Jadwal Perkuliahan</h2>
-          <p class="text-xs text-[#67748E]">Kelola jadwal mingguan Anda atau hasil ektraksi OCR.</p>
+          <p class="text-xs text-[#67748E]">Kelola jadwal mingguan Anda atau hasil ekstraksi OCR.</p>
         </div>
         <div id="schedule-grid" class="grid grid-cols-1 md:grid-cols-5 gap-4"></div>
       </section>
@@ -254,7 +254,7 @@
         <div class="grid grid-cols-2 gap-6">
           <div class="bg-white p-6 rounded-3xl border border-[#EAF4FC] space-y-2">
             <p class="text-xs text-[#67748E]">Total Waktu Belajar</p>
-            <h3 id="stat-[#344767]-mins" class="text-3xl font-extrabold text-[#344767]">145 Menit</h3>
+            <h3 id="stat-study-mins" class="text-3xl font-extrabold text-[#344767]">145 Menit</h3>
           </div>
           <div class="bg-white p-6 rounded-3xl border border-[#EAF4FC] space-y-2">
             <p class="text-xs text-[#67748E]">Penyelesaian Tugas</p>
@@ -549,7 +549,6 @@
     // Global Search
     function handleSearch(query) {
       if(!query.trim()) return;
-      // Pindah ke tab tasks jika mencari
       switchTab('Tasks');
     }
 
