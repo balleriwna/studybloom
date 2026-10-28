@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Studybloom — Personal Academic Companion</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Custom Tailwind Color Scheme (Soft Blue Theme) -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'sb-primary': '#A7C7E7',    /* Soft Blue Utama */
+            'sb-powder': '#D6E8F5',     /* Powder Blue */
+            'sb-light': '#EAF4FC',      /* Light Blue */
+            'sb-pale': '#F4F9FD',       /* Pale Blue (App Background) */
+            'sb-dark': '#344767',       /* Dark Blue Utama (Teks) */
+            'sb-subtext': '#67748E',    /* Slate Subtext */
+            'sb-lavender': '#D8D2E7',   /* Ujian Accent */
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+  </style>
+</head>
+<body class="bg-[#F4F9FD] text-[#344767] h-screen overflow-hidden flex">
+
+  <!-- TOAST NOTIFICATION POPUP -->
+  <div id="toast" class="hidden fixed top-5 right-5 z-50 bg-[#344767] text-white px-5 py-3.5 rounded-2xl shadow-xl flex items-center gap-3 transition-all duration-300">
+    <i data-lucide="sparkles" class="text-[#A7C7E7] w-5 h-5"></i>
+    <span id="toast-message" class="text-sm font-semibold">Notifikasi</span>
+  </div>
+
+  <!-- 1. SIDEBAR NAVIGATION -->
+  <aside class="w-64 bg-white border-r border-[#EAF4FC] flex flex-col justify-between p-5 z-20 shadow-sm shrink-0">
+    <div>
+      <!-- Logo -->
+      <div class="flex items-center gap-3 px-2 py-3 mb-6">
+        <div class="w-10 h-10 rounded-2xl bg-[#A7C7E7] flex items-center justify-center text-white font-bold text-xl shadow-md">
+          🌸
+        </div>
+        <span class="text-xl font-bold tracking-tight text-[#344767]">Studybloom</span>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="space-y-1.5" id="sidebar-menu">
+        <button onclick="switchTab('Dashboard')" id="nav-Dashboard" class="nav-btn active-nav w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-semibold transition-all">
+          <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard
+        </button>
+        <button onclick="switchTab('Schedule')" id="nav-Schedule" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-semibold text-[#67748E] hover:bg-[#EAF4FC] transition-all">
+          <i data-lucide="calendar" class="w-5 h-5"></i> My Schedule
+        </button>
+        <button onclick="switchTab('Tasks')" id="nav-Tasks" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-semibold text-[#67748E] hover:bg-[#EAF4FC] transition-all">
+          <i data-lucide="check-square" class="w-5 h-5"></i> My Tasks
+        </button>
+        <button onclick="switchTab('Courses')" id="nav-Courses" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-semibold text-[#67748E] hover:bg-[#EAF4FC] transition-all">
+          <i data-lucide="book-open" class="w-5 h-5"></i> My Courses
+        </button>
+        <button onclick="switchTab('Notes')" id="nav-Notes" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-semibold text-[#67748E] hover:bg-[#EAF4FC] transition-all">
+          <i data-lucide="edit-3" class="w-5 h-5"></i> My Notes
+        </button>
+        <button onclick="switchTab('Timer')" id="nav-Timer" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-semibold text-[#67748E] hover:bg-[#EAF4FC] transition-all">
+          <i data-lucide="clock" class="w-5 h-5"></i> Focus Timer
+        </button>
+        <button onclick="switchTab('Progress')" id="nav-Progress" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3 rounded-2xl text-sm font-semibold text-[#67748E] hover:bg-[#EAF4FC] transition-all">
+          <i data-lucide="award" class="w-5 h-5"></i> My Progress
+        </button>
+      </nav>
+    </div>
+
+    <!-- User Profile Widget -->
+    <div class="p-3 bg-[#F4F9FD] rounded-2xl flex items-center gap-3">
+      <div class="w-9 h-9 rounded-full bg-[#A7C7E7] text-white flex items-center justify-center font-bold text-sm">
+        NR
+      </div>
+      <div class="overflow-hidden">
+        <h4 class="text-xs font-bold text-[#344767] truncate">Naladhipa Rawnie</h4>
+        <p class="text-[11px] text-[#67748E] truncate">UNS • Hukum</p>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT AREA -->
+  <div class="flex-1 flex flex-col overflow-y-auto">
+    
+    <!-- TOP HEADER -->
+    <header class="h-20 bg-white/80 backdrop-blur-md border-b border-[#EAF4FC] px-8 flex items-center justify-between sticky top-0 z-10 shrink-0">
+      <div class="relative w-80">
+        <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#67748E] w-4 h-4"></i>
+        <input type="text" id="global-search" oninput="handleSearch(this.value)" placeholder="Cari tugas atau mata kuliah..." class="w-full bg-[#F4F9FD] text-xs text-[#344767] pl-10 pr-4 py-2.5 rounded-2xl border border-transparent focus:border-[#A7C7E7] outline-none">
+      </div>
+
+      <div class="flex items-center gap-3">
+        <button onclick="openOcrModal()" class="flex items-center gap-2 bg-[#EAF4FC] text-[#344767] px-4 py-2.5 rounded-2xl text-xs font-bold hover:bg-[#D6E8F5] transition-all">
+          <i data-lucide="upload" class="w-4 h-4"></i> Unggah Jadwal (OCR)
+        </button>
+        <button onclick="openAddTaskModal()" class="flex items-center gap-2 bg-[#A7C7E7] text-white px-4 py-2.5 rounded-2xl text-xs font-bold hover:bg-[#5B86E5] shadow-xs transition-all">
+          <i data-lucide="plus" class="w-4 h-4"></i> Task Baru
+        </button>
+      </div>
+    </header>
+
+    <!-- DYNAMIC TAB CONTENT -->
+    <main class="p-8 flex-1">
+      
+      <!-- DASHBOARD TAB -->
+      <section id="tab-Dashboard" class="tab-view space-y-6">
+        <div class="grid grid-cols-12 gap-8">
+          <!-- Main 8 Cols -->
+          <div class="col-span-12 lg:col-span-8 space-y-6">
+            <div class="bg-gradient-to-r from-[#D6E8F5] via-[#EAF4FC] to-white p-7 rounded-3xl border border-[#EAF4FC] shadow-xs">
+              <span class="text-xs font-bold uppercase tracking-wider text-[#67748E]">Rabu, 28 Oktober 2026</span>
+              <h1 class="text-2xl font-bold text-[#344767] mt-1">Selamat Pagi, Nala! 👋</h1>
+              <p class="text-sm text-[#67748E] mt-1">Kelola jadwal perkuliahan, deadline tugas, dan produktivitas belajar Anda dalam satu tempat.</p>
+            </div>
+
+            <!-- Stats -->
+            <div class="grid grid-cols-3 gap-4">
+              <div class="bg-white p-5 rounded-3xl border border-[#EAF4FC] shadow-xs">
+                <p class="text-xs font-semibold text-[#67748E]">Tugas Aktif</p>
+                <h3 id="stat-active-tasks" class="text-2xl font-extrabold text-[#344767] mt-1">0</h3>
+              </div>
+              <div class="bg-white p-5 rounded-3xl border border-[#EAF4FC] shadow-xs">
+                <p class="text-xs font-semibold text-[#67748E]">Mendekati Deadline</p>
+                <h3 class="text-2xl font-extrabold text-[#344767] mt-1">2</h3>
+              </div>
+              <div class="bg-white p-5 rounded-3xl border border-[#EAF4FC] shadow-xs">
+                <p class="text-xs font-semibold text-[#67748E]">Tugas Selesai</p>
+                <h3 id="stat-completed-tasks" class="text-2xl font-extrabold text-[#344767] mt-1">0</h3>
+              </div>
+            </div>
+
+            <!-- Schedule List -->
+            <div class="bg-white p-6 rounded-3xl border border-[#EAF4FC] shadow-xs space-y-4">
+              <div class="flex justify-between items-center">
+                <h3 class="text-base font-bold text-[#344767]">Jadwal Kuliah Hari Ini</h3>
+                <button onclick="switchTab('Schedule')" class="text-xs font-bold text-[#67748E] hover:text-[#344767]">Lihat Semua ›</button>
+              </div>
+              <div id="today-schedule-list" class="space-y-3"></div>
+            </div>
+
+            <!-- Quick Notes -->
+            <div class="bg-white p-6 rounded-3xl border border-[#EAF4FC] shadow-xs space-y-3">
+              <div class="flex justify-between items-center">
+                <h3 class="text-base font-bold text-[#344767]">Quick Notes (Catatan Cepat)</h3>
+                <span class="text-[11px] font-semibold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-full">✓ Autosaved</span>
+              </div>
+              <textarea id="quick-note-input" oninput="saveQuickNote(this.value)" placeholder="Tulis ide atau pengingat instan di sini..." class="w-full h-24 bg-[#F4F9FD] p-4 rounded-2xl text-sm text-[#344767] outline-none border border-transparent focus:border-[#A7C7E7] resize-none"></textarea>
+              <div class="flex justify-end">
+                <button onclick="convertQuickNoteToTask()" class="px-4 py-2 bg-[#EAF4FC] text-[#344767] rounded-xl text-xs font-bold hover:bg-[#D6E8F5]">
+                  + Ubah Jadi Task
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right 4 Cols -->
+          <div class="col-span-12 lg:col-span-4 space-y-6">
+            <!-- Mini Calendar -->
+            <div class="bg-white p-6 rounded-3xl border border-[#EAF4FC] shadow-xs space-y-4">
+              <h3 class="text-base font-bold text-[#344767]">Oktober 2026</h3>
+              <div class="grid grid-cols-7 gap-1 text-center text-xs font-bold text-[#67748E]" id="mini-calendar"></div>
+            </div>
+
+            <!-- Pomodoro Link Widget -->
+            <div className="bg-gradient-to-br from-[#EAF4FC] to-white p-6 rounded-3xl border border-[#EAF4FC] text-center space-y-3">
+              <span class="text-xs font-bold text-[#67748E] uppercase tracking-wider block">Focus Session</span>
+              <h2 class="text-3xl font-extrabold text-[#344767] my-2">25:00</h2>
+              <button onclick="switchTab('Timer')" class="w-full py-2.5 bg-[#A7C7E7] text-white font-bold text-xs rounded-2xl hover:bg-[#5B86E5] shadow-xs transition-all">
+                Mulai Sesi Belajar
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SCHEDULE TAB -->
+      <section id="tab-Schedule" class="tab-view hidden space-y-6">
+        <div>
+          <h2 class="text-xl font-bold text-[#344767]">Jadwal Perkuliahan</h2>
+          <p class="text-xs text-[#67748E]">Kelola jadwal mingguan Anda atau hasil ektraksi OCR.</p>
+        </div>
+        <div id="schedule-grid" class="grid grid-cols-1 md:grid-cols-5 gap-4"></div>
+      </section>
+
+      <!-- TASKS TAB -->
+      <section id="tab-Tasks" class="tab-view hidden space-y-6">
+        <div class="flex justify-between items-center">
+          <div>
+            <h2 class="text-xl font-bold text-[#344767]">Manajemen Tugas</h2>
+            <p class="text-xs text-[#67748E]">Lacak progress pengerjaan tugas akademik Anda.</p>
+          </div>
+          <button onclick="openAddTaskModal()" class="bg-[#A7C7E7] text-white px-4 py-2 rounded-xl text-xs font-bold">+ Add Task</button>
+        </div>
+        <div id="tasks-kanban" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+      </section>
+
+      <!-- COURSES TAB -->
+      <section id="tab-Courses" class="tab-view hidden space-y-6">
+        <div>
+          <h2 class="text-xl font-bold text-[#344767]">Mata Kuliah Semester Ini</h2>
+          <p class="text-xs text-[#67748E]">Daftar mata kuliah terpindai dari sistem kampus.</p>
+        </div>
+        <div id="courses-grid" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+      </section>
+
+      <!-- NOTES TAB -->
+      <section id="tab-Notes" class="tab-view hidden space-y-6">
+        <div class="grid grid-cols-12 gap-8">
+          <div class="col-span-5 bg-white p-6 rounded-3xl border border-[#EAF4FC] space-y-3">
+            <h3 class="text-base font-bold text-[#344767]">Tulis Catatan</h3>
+            <input type="text" id="note-title" placeholder="Judul Catatan..." class="w-full bg-[#F4F9FD] p-3 rounded-2xl text-xs border outline-none">
+            <textarea id="note-content" placeholder="Isi catatan..." class="w-full h-32 bg-[#F4F9FD] p-3 rounded-2xl text-xs border outline-none resize-none"></textarea>
+            <button onclick="addNote()" class="w-full py-2.5 bg-[#A7C7E7] text-white font-bold rounded-2xl text-xs">Simpan Catatan</button>
+          </div>
+          <div id="notes-list" class="col-span-7 space-y-3"></div>
+        </div>
+      </section>
+
+      <!-- TIMER TAB -->
+      <section id="tab-Timer" class="tab-view hidden space-y-6">
+        <div class="max-w-md mx-auto bg-white p-8 rounded-4xl border border-[#EAF4FC] text-center space-y-6 shadow-xs">
+          <h2 class="text-xl font-bold text-[#344767]">Pomodoro Focus Timer</h2>
+          <div class="w-52 h-52 mx-auto rounded-full bg-gradient-to-br from-[#EAF4FC] to-[#D6E8F5] flex items-center justify-center border-8 border-white shadow-inner">
+            <span id="timer-display" class="text-4xl font-extrabold text-[#344767]">25:00</span>
+          </div>
+          <div class="flex justify-center gap-3">
+            <button id="timer-btn" onclick="toggleTimer()" class="px-6 py-3 bg-[#A7C7E7] text-white font-bold text-xs rounded-2xl hover:bg-[#5B86E5]">Mulai Belajar</button>
+            <button onclick="resetTimer()" class="p-3 bg-[#F4F9FD] text-[#344767] rounded-2xl hover:bg-[#EAF4FC]">Reset</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- PROGRESS TAB -->
+      <section id="tab-Progress" class="tab-view hidden space-y-6">
+        <div>
+          <h2 class="text-xl font-bold text-[#344767]">My Academic Progress</h2>
+          <p class="text-xs text-[#67748E]">Statistik real-time waktu dan penyelesaian tugas.</p>
+        </div>
+        <div class="grid grid-cols-2 gap-6">
+          <div class="bg-white p-6 rounded-3xl border border-[#EAF4FC] space-y-2">
+            <p class="text-xs text-[#67748E]">Total Waktu Belajar</p>
+            <h3 id="stat-[#344767]-mins" class="text-3xl font-extrabold text-[#344767]">145 Menit</h3>
+          </div>
+          <div class="bg-white p-6 rounded-3xl border border-[#EAF4FC] space-y-2">
+            <p class="text-xs text-[#67748E]">Penyelesaian Tugas</p>
+            <h3 id="stat-rate" class="text-3xl font-extrabold text-[#344767]">100%</h3>
+          </div>
+        </div>
+      </section>
+
+    </main>
+  </div>
+
+  <!-- MODAL: ADD TASK -->
+  <div id="modal-add-task" class="hidden fixed inset-0 bg-black/30 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-md rounded-3xl p-6 shadow-xl space-y-4">
+      <div class="flex justify-between items-center">
+        <h3 class="text-base font-bold text-[#344767]">Tambah Tugas Baru</h3>
+        <button onclick="closeAddTaskModal()"><i data-lucide="x" class="w-4 h-4"></i></button>
+      </div>
+      <div class="space-y-3 text-xs">
+        <input type="text" id="task-input-title" placeholder="Judul Tugas..." class="w-full bg-[#F4F9FD] p-3 rounded-2xl border outline-none">
+        <input type="date" id="task-input-date" class="w-full bg-[#F4F9FD] p-3 rounded-2xl border outline-none">
+        <button onclick="saveNewTask()" class="w-full py-3 bg-[#A7C7E7] text-white font-bold rounded-2xl">Simpan Tugas</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: OCR SCANNER (STAR UMS) -->
+  <div id="modal-ocr" class="hidden fixed inset-0 bg-black/30 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-md rounded-3xl p-6 shadow-xl space-y-4 text-center">
+      <h3 class="text-base font-bold text-[#344767]">OCR Scanner Jadwal Kuliah</h3>
+      <p class="text-xs text-[#67748E]">Simulasi pemindaian gambar jadwal STAR UMS</p>
+      <div class="border-2 border-dashed border-[#A7C7E7] p-8 rounded-2xl bg-[#F4F9FD]">
+        <button onclick="runOcrSimulation()" id="ocr-btn" class="px-4 py-2 bg-[#A7C7E7] text-white font-bold text-xs rounded-xl">Mulai Pindai Gambar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT APPLICATION LOGIC -->
+  <script>
+    // Lucide Icon Initialization
+    lucide.createIcons();
+
+    // App State Management
+    let courses = JSON.parse(localStorage.getItem('sb_courses')) || [
+      { id: 'c1', code: 'LAW3231407', name: 'Hukum Administrasi Negara', lecturer: 'Dr. Ahmad Sanusi', room: 'R.302', day: 'Senin', time: '07:00 - 08:40' },
+      { id: 'c2', code: 'LAW3231408', name: 'Hukum Dagang', lecturer: 'Prof. Endang Rahayu', room: 'R.204', day: 'Senin', time: '09:00 - 10:40' },
+      { id: 'c3', code: 'LAW3231409', name: 'Hukum Acara Pidana', lecturer: 'Bambang Tri, M.Hum.', room: 'R.105', day: 'Selasa', time: '07:00 - 08:40' },
+    ];
+
+    let tasks = JSON.parse(localStorage.getItem('sb_tasks')) || [
+      { id: 't1', title: 'Analisis Sengketa PTUN', courseName: 'Hukum Administrasi Negara', dueDate: '2026-10-28', status: 'In Progress' },
+      { id: 't2', title: 'Resume Jurnal KUHD', courseName: 'Hukum Dagang', dueDate: '2026-10-29', status: 'To Do' }
+    ];
+
+    let notes = JSON.parse(localStorage.getItem('sb_notes')) || [
+      { id: 'n1', title: 'Asas Hukum Acara Pidana', content: 'Presumption of innocence diatur dalam Pasal 8 KUHAP.' }
+    ];
+
+    let studyMins = parseInt(localStorage.getItem('sb_study_mins')) || 145;
+
+    // Save State Helper
+    function saveData() {
+      localStorage.setItem('sb_courses', JSON.stringify(courses));
+      localStorage.setItem('sb_tasks', JSON.stringify(tasks));
+      localStorage.setItem('sb_notes', JSON.stringify(notes));
+      localStorage.setItem('sb_study_mins', studyMins);
+      renderAll();
+    }
+
+    // Toast Helper
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      document.getElementById('toast-message').innerText = msg;
+      t.classList.remove('hidden');
+      setTimeout(() => t.classList.add('hidden'), 3000);
+    }
+
+    // Navigation Switcher
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-view').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.nav-btn').forEach(el => {
+        el.classList.remove('bg-[#D6E8F5]', 'text-[#344767]');
+        el.classList.add('text-[#67748E]');
+      });
+
+      document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+      const activeBtn = document.getElementById(`nav-${tabName}`);
+      if(activeBtn) {
+        activeBtn.classList.add('bg-[#D6E8F5]', 'text-[#344767]');
+        activeBtn.classList.remove('text-[#67748E]');
+      }
+    }
+
+    // Render Logic
+    function renderAll() {
+      // Quick Note Input
+      document.getElementById('quick-note-input').value = localStorage.getItem('sb_quicknote') || '';
+
+      // Dashboard Stats
+      const pending = tasks.filter(t => t.status !== 'Completed').length;
+      const completed = tasks.filter(t => t.status === 'Completed').length;
+      document.getElementById('stat-active-tasks').innerText = pending;
+      document.getElementById('stat-completed-tasks').innerText = completed;
+
+      // Dashboard Today Schedule
+      const schedContainer = document.getElementById('today-schedule-list');
+      schedContainer.innerHTML = courses.slice(0, 2).map(c => `
+        <div class="flex items-center justify-between p-4 rounded-2xl bg-[#F4F9FD] border border-[#EAF4FC]">
+          <div>
+            <h4 class="text-xs font-bold text-[#344767]">${c.name}</h4>
+            <p class="text-[11px] text-[#67748E]">${c.code} • ${c.room}</p>
+          </div>
+          <span class="text-xs font-bold text-[#344767] bg-white px-3 py-1 rounded-xl shadow-2xs">${c.time}</span>
+        </div>
+      `).join('');
+
+      // Mini Calendar
+      const cal = document.getElementById('mini-calendar');
+      let calHtml = ['M','S','S','R','K','J','S'].map(d => `<div class="py-1">${d}</div>`).join('');
+      for(let i=1; i<=31; i++) {
+        calHtml += `<div class="py-1 rounded-lg ${i === 28 ? 'bg-[#A7C7E7] text-white font-bold' : ''}">${i}</div>`;
+      }
+      cal.innerHTML = calHtml;
+
+      // Schedule View
+      const days = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jum\'at'];
+      document.getElementById('schedule-grid').innerHTML = days.map(d => {
+        const dCourses = courses.filter(c => c.day === d);
+        return `
+          <div class="bg-white p-4 rounded-3xl border border-[#EAF4FC] space-y-2">
+            <h4 class="text-xs font-bold text-[#344767] border-b pb-2">${d}</h4>
+            ${dCourses.map(c => `
+              <div class="p-2.5 bg-[#F4F9FD] rounded-xl text-[11px]">
+                <p class="font-bold text-[#344767]">${c.name}</p>
+                <p class="text-[#67748E]">${c.time}</p>
+              </div>
+            `).join('') || '<p class="text-[10px] text-[#67748E]">Kosong</p>'}
+          </div>
+        `;
+      }).join('');
+
+      // Tasks View (Kanban)
+      const statuses = ['To Do', 'In Progress', 'Completed'];
+      document.getElementById('tasks-kanban').innerHTML = statuses.map(s => {
+        const sTasks = tasks.filter(t => t.status === s);
+        return `
+          <div class="bg-white p-5 rounded-3xl border border-[#EAF4FC] space-y-3">
+            <h3 class="text-xs font-bold text-[#344767] border-b pb-2 flex justify-between">
+              <span>${s}</span>
+              <span class="bg-[#EAF4FC] px-2 rounded-full">${sTasks.length}</span>
+            </h3>
+            ${sTasks.map(t => `
+              <div class="p-3 bg-[#F4F9FD] rounded-2xl text-xs space-y-1">
+                <p class="font-bold text-[#344767]">${t.title}</p>
+                <p class="text-[10px] text-[#67748E]">${t.dueDate}</p>
+                <button onclick="cycleTaskStatus('${t.id}')" class="text-[10px] text-blue-600 font-bold hover:underline">Ubah Status ➔</button>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }).join('');
+
+      // Courses View
+      document.getElementById('courses-grid').innerHTML = courses.map(c => `
+        <div class="bg-white p-5 rounded-3xl border border-[#EAF4FC] space-y-2">
+          <span class="text-[10px] font-bold bg-[#D6E8F5] px-2 py-0.5 rounded-md">${c.code}</span>
+          <h4 class="text-xs font-bold text-[#344767]">${c.name}</h4>
+          <p class="text-[11px] text-[#67748E]">${c.lecturer}</p>
+        </div>
+      `).join('');
+
+      // Notes View
+      document.getElementById('notes-list').innerHTML = notes.map(n => `
+        <div class="bg-white p-4 rounded-3xl border border-[#EAF4FC] space-y-1">
+          <h4 class="text-xs font-bold text-[#344767]">${n.title}</h4>
+          <p class="text-xs text-[#67748E]">${n.content}</p>
+        </div>
+      `).join('');
+    }
+
+    // Quick Note Functions
+    function saveQuickNote(val) {
+      localStorage.setItem('sb_quicknote', val);
+    }
+
+    function convertQuickNoteToTask() {
+      const val = document.getElementById('quick-note-input').value;
+      if(!val.trim()) return;
+      tasks.push({
+        id: `t_${Date.now()}`,
+        title: val.slice(0, 30),
+        dueDate: '2026-10-30',
+        status: 'To Do'
+      });
+      document.getElementById('quick-note-input').value = '';
+      saveQuickNote('');
+      saveData();
+      showToast('✅ Catatan dikonversi menjadi Task baru!');
+    }
+
+    // Modal Helpers
+    function openAddTaskModal() { document.getElementById('modal-add-task').classList.remove('hidden'); }
+    function closeAddTaskModal() { document.getElementById('modal-add-task').classList.add('hidden'); }
+    function openOcrModal() { document.getElementById('modal-ocr').classList.remove('hidden'); }
+
+    function saveNewTask() {
+      const title = document.getElementById('task-input-title').value;
+      const date = document.getElementById('task-input-date').value;
+      if(!title) return;
+      tasks.push({ id: `t_${Date.now()}`, title, dueDate: date || '2026-10-30', status: 'To Do' });
+      closeAddTaskModal();
+      saveData();
+      showToast('📝 Tugas baru ditambahkan!');
+    }
+
+    function runOcrSimulation() {
+      const btn = document.getElementById('ocr-btn');
+      btn.innerText = 'Memproses OCR...';
+      setTimeout(() => {
+        courses.push({ id: `c_${Date.now()}`, code: 'LAW3231218', name: 'Kriminologi', lecturer: 'Dosen Kriminologi', room: 'R.102', day: 'Kamis', time: '05–06' });
+        btn.innerText = 'Mulai Pindai Gambar';
+        document.getElementById('modal-ocr').classList.add('hidden');
+        saveData();
+        showToast('✨ OCR Berhasil! Jadwal Kriminologi ditambahkan.');
+      }, 1200);
+    }
+
+    function cycleTaskStatus(id) {
+      tasks = tasks.map(t => {
+        if(t.id === id) {
+          const next = t.status === 'To Do' ? 'In Progress' : t.status === 'In Progress' ? 'Completed' : 'To Do';
+          return { ...t, status: next };
+        }
+        return t;
+      });
+      saveData();
+    }
+
+    function addNote() {
+      const title = document.getElementById('note-title').value;
+      const content = document.getElementById('note-content').value;
+      if(!title || !content) return;
+      notes.push({ id: `n_${Date.now()}`, title, content });
+      document.getElementById('note-title').value = '';
+      document.getElementById('note-content').value = '';
+      saveData();
+      showToast('📓 Catatan berhasil disimpan!');
+    }
+
+    // Pomodoro Timer Logic
+    let timerInterval = null;
+    let timerSecs = 25 * 60;
+    let isTimerRunning = false;
+
+    function toggleTimer() {
+      const btn = document.getElementById('timer-btn');
+      if(!isTimerRunning) {
+        isTimerRunning = true;
+        btn.innerText = 'Pause';
+        timerInterval = setInterval(() => {
+          timerSecs--;
+          updateTimerDisplay();
+          if(timerSecs <= 0) {
+            clearInterval(timerInterval);
+            studyMins += 25;
+            saveData();
+            showToast('⏱️ Sesi belajar 25 menit selesai!');
+            resetTimer();
+          }
+        }, 1000);
+      } else {
+        isTimerRunning = false;
+        clearInterval(timerInterval);
+        btn.innerText = 'Lanjutkan';
+      }
+    }
+
+    function resetTimer() {
+      clearInterval(timerInterval);
+      isTimerRunning = false;
+      timerSecs = 25 * 60;
+      document.getElementById('timer-btn').innerText = 'Mulai Belajar';
+      updateTimerDisplay();
+    }
+
+    function updateTimerDisplay() {
+      const m = Math.floor(timerSecs / 60).toString().padStart(2, '0');
+      const s = (timerSecs % 60).toString().padStart(2, '0');
+      document.getElementById('timer-display').innerText = `${m}:${s}`;
+    }
+
+    // Global Search
+    function handleSearch(query) {
+      if(!query.trim()) return;
+      // Pindah ke tab tasks jika mencari
+      switchTab('Tasks');
+    }
+
+    // Initial Load
+    switchTab('Dashboard');
+    renderAll();
+  </script>
+</body>
+</html>
